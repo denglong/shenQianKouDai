@@ -1,0 +1,195 @@
+//
+//  HeaderClassifyView.m
+//  MeykiEFarm
+//
+//  Created by meyki on 11/1/16.
+//  Copyright © 2016 邓龙. All rights reserved.
+//
+
+#import "HeaderClassifyView.h"
+#import "Headers.h"
+#import "FL_Button.h"
+#import "NSString+Extension.h"
+#import "HotCategoriesModel.h"
+
+@implementation HeaderClassifyView
+
++ (HeaderClassifyView *)createHeaderClassifyView:(NSArray *)models address:(NSString *)address block:(ClassffyClickBlock)block {
+    
+    HeaderClassifyView *classifyView = [[HeaderClassifyView alloc] init];
+    classifyView.frame = CGRectMake(0, viewWidth*0.66, viewWidth, 170);
+    classifyView.clickBlock = block;
+    
+    UIView *leftView = [[UIView alloc] init];
+    leftView.layer.cornerRadius = 11.5;
+    leftView.backgroundColor = [UIColor_HEX colorWithHexString:@"EDEDED"];
+    [classifyView addSubview:leftView];
+    
+    UIView *rightView = [[UIView alloc] init];
+    rightView.layer.cornerRadius = 11.5;
+    rightView.backgroundColor = [UIColor_HEX colorWithHexString:@"EDEDED"];
+    [classifyView addSubview:rightView];
+    
+    UILabel *addressLab = [[UILabel alloc] init];
+    addressLab.font = [UIFont systemFontOfSize:13];
+    addressLab.textColor = [UIColor_HEX colorWithHexString:@"515151"];
+    if ([DataCheck isValidString:address]) {
+        addressLab.text = address;
+    }
+    else
+    {
+        addressLab.text = @"定位中...";
+    }
+    addressLab.textAlignment = NSTextAlignmentCenter;
+    addressLab.userInteractionEnabled = YES;
+    addressLab.backgroundColor = [UIColor_HEX colorWithHexString:@"EDEDED"];
+    classifyView.addressLab = addressLab;
+    [classifyView addSubview:addressLab];
+    
+    UIImageView *bottomArrow = [[UIImageView alloc] init];
+    bottomArrow.image = UIIMAGE(@"bottomArrowImg");
+    [classifyView addSubview:bottomArrow];
+    
+    UIButton *addressButton = [[UIButton alloc] init];
+    classifyView.addressBtn = addressButton;
+    [addressLab addSubview:addressButton];
+    
+    UIImageView *middleImg = [[UIImageView alloc] init];
+    middleImg.image = [UIImage imageNamed:@"icon_location"];
+    
+    UIImageView *middleBg = [[UIImageView alloc] init];
+    middleBg.image = UIIMAGE(@"Mask");
+    
+    [middleBg addSubview:middleImg];
+    [classifyView addSubview:middleBg];
+    
+    for (NSInteger i = 0; i<models.count; i++) {
+        
+        HotCategoriesModel *model = (HotCategoriesModel *)models[i];
+        
+        UIView *bgView = [[UIView alloc] init];
+        CGFloat width = viewWidth/models.count;
+        if (i>models.count) {
+            
+            bgView.frame = CGRectMake((i-6)*width, width+40, width, width);
+        }
+        else
+        {
+            bgView.frame = CGRectMake(i*width, 37, width, width);
+        }
+        
+        UIImageView *imgView = [[UIImageView alloc] init];
+        NSString *urlStr = [NSString stringWithFormat:@"%@?x-oss-process=image/resize,m_lfit,h_500,w_500", model.imageUrl];
+        [imgView setImageWithURL:[NSURL URLWithString:urlStr] placeholderImage:UIIMAGE(@"icon_homeDef")];
+        
+        UILabel *name = [[UILabel alloc] init];
+        [bgView addSubview:imgView];
+        [bgView addSubview:name];
+        [classifyView addSubview:bgView];
+        
+        name.font = [UIFont systemFontOfSize:11];
+        name.textColor = [UIColor_HEX colorWithHexString:@"323232"];
+        name.textAlignment = NSTextAlignmentCenter;
+        name.text = model.name;
+        
+        UIButton *clickBtn = [[UIButton alloc] init];
+        clickBtn.tag = i;
+        [bgView addSubview:clickBtn];
+        [clickBtn addTarget:classifyView
+                     action:@selector(clickAction:)
+           forControlEvents:UIControlEventTouchUpInside];
+        
+        [imgView mas_makeConstraints:^(MASConstraintMaker *make) {
+            
+            make.centerX.equalTo(bgView.mas_centerX);
+            make.centerY.equalTo(bgView.mas_centerY).with.offset(-10);
+            make.width.equalTo(@44);
+            make.height.equalTo(@44);
+        }];
+        
+        [name mas_makeConstraints:^(MASConstraintMaker *make) {
+            
+            make.top.equalTo(imgView.mas_bottom).with.offset(5);
+            make.left.equalTo(bgView).with.offset(0);
+            make.right.equalTo(bgView).with.offset(0);
+            make.height.equalTo(@14);
+        }];
+        
+        UIEdgeInsets edge = UIEdgeInsetsMake(0, 0, 0, 0);
+        [clickBtn mas_makeConstraints:^(MASConstraintMaker *make) {
+            
+            make.edges.equalTo(bgView).insets(edge);
+        }];
+    }
+    
+    [middleBg mas_makeConstraints:^(MASConstraintMaker *make) {
+       
+        make.top.equalTo(classifyView).with.offset(-10);
+        make.centerX.equalTo(classifyView.mas_centerX);
+        make.width.equalTo(@(40));
+        make.height.equalTo(@(21));
+    }];
+    
+    [middleImg mas_makeConstraints:^(MASConstraintMaker *make) {
+        
+        make.width.equalTo(@(11));
+        make.height.equalTo(@(15));
+        make.centerX.equalTo(middleBg.mas_centerX);
+        make.centerY.equalTo(middleBg.mas_centerY).offset(2);
+    }];
+    
+    [addressLab mas_makeConstraints:^(MASConstraintMaker *make) {
+        
+        make.top.equalTo(classifyView).with.offset(15);
+        make.centerX.equalTo(classifyView.mas_centerX).with.offset(-10);
+        make.height.equalTo(@(23));
+        make.width.greaterThanOrEqualTo(@(60));
+        make.width.lessThanOrEqualTo(@(viewWidth - 60));
+    }];
+    
+    [addressButton mas_makeConstraints:^(MASConstraintMaker *make) {
+        
+        make.top.equalTo(addressLab).offset(0);
+        make.left.equalTo(addressLab).offset(0);
+        make.width.equalTo(addressLab.mas_width);
+        make.height.equalTo(addressLab.mas_height);
+    }];
+    
+    [bottomArrow mas_makeConstraints:^(MASConstraintMaker *make) {
+        
+        make.left.equalTo(addressLab.mas_right).with.offset(5);
+        make.width.equalTo(@11);
+        make.height.equalTo(@6);
+        make.centerY.equalTo(addressLab.mas_centerY);
+    }];
+    
+    [leftView mas_makeConstraints:^(MASConstraintMaker *make) {
+        
+        make.right.equalTo(addressLab.mas_left).with.offset(11.5);
+        make.centerY.equalTo(addressLab.mas_centerY);
+        make.width.equalTo(@23);
+        make.height.equalTo(@23);
+    }];
+    
+    [rightView mas_makeConstraints:^(MASConstraintMaker *make) {
+        
+        make.left.equalTo(addressLab.mas_right).with.offset(-11.5);
+        make.centerY.equalTo(addressLab.mas_centerY);
+        make.width.equalTo(@40);
+        make.height.equalTo(@23);
+    }];
+    
+    return classifyView;
+}
+
+- (void)clickAction:(UIButton *)sender {
+    
+    self.clickBlock(sender.tag);
+}
+
+- (void)setAddressString:(NSString *)str {
+    
+    self.addressLab.text = str;
+}
+
+@end

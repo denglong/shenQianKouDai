@@ -1,0 +1,25 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "407257b7-28d8-4af8-9e6b-1c81d3b7b0d6++4065",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+    "407257b7-28d8-4af8-9e6b-1c81d3b7b0d6++4065" : {
+
+    }
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "407257b7-28d8-4af8-9e6b-1c81d3b7b0d6++4065" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "AA945AA2-3E89-4A5C-B095-41628F47C12F",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "407257b7-28d8-4af8-9e6b-1c81d3b7b0d6++4065" : "KingProFrame\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "KingProFrame",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "KingProFrame.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "http:\/\/code.taobao.org\/svn\/denglong_code",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Subversion",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "407257b7-28d8-4af8-9e6b-1c81d3b7b0d6++4065"
+    }
+  ]
+}

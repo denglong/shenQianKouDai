@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13196" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13173"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="CommodityDetailsViewController">
+            <connections>
+                <outlet property="commodityCollectionView" destination="EgV-uo-vFa" id="Za2-sj-oQF"/>
+                <outlet property="myShopNum" destination="cRn-T6-1zo" id="hz9-Wz-lAN"/>
+                <outlet property="redWidthConstraint" destination="jfA-QT-0Rh" id="Qel-1s-Non"/>
+                <outlet property="selectedOkBtn" destination="W5Q-bV-Umh" id="Jdc-Pg-bFJ"/>
+                <outlet property="selectedOkView" destination="isj-h7-rna" id="Gse-L9-HDZ"/>
+                <outlet property="shopCartImage" destination="fHs-gU-YWl" id="WEQ-om-55q"/>
+                <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="EgV-uo-vFa">
+                    <rect key="frame" x="0.0" y="-20" width="375" height="638"/>
+                    <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+                    <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="0.0" minimumInteritemSpacing="0.0" id="0eE-xo-WkH">
+                        <size key="itemSize" width="0.0" height="0.0"/>
+                        <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                        <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                        <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                    </collectionViewFlowLayout>
+                    <connections>
+                        <outlet property="dataSource" destination="-1" id="fI2-1x-zPc"/>
+                        <outlet property="delegate" destination="-1" id="S0r-tH-bym"/>
+                    </connections>
+                </collectionView>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="isj-h7-rna">
+                    <rect key="frame" x="0.0" y="618" width="375" height="49"/>
+                    <subviews>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ANd-zn-N19">
+                            <rect key="frame" x="0.0" y="0.0" width="375" height="1"/>
+                            <color key="backgroundColor" red="0.93333333333333335" green="0.93333333333333335" blue="0.93333333333333335" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="0.5" id="6Y2-cc-iVu"/>
+                            </constraints>
+                        </view>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="W5Q-bV-Umh">
+                            <rect key="frame" x="257" y="0.0" width="118" height="49"/>
+                            <color key="backgroundColor" red="0.14509803921568626" green="0.73725490196078436" blue="0.9882352941176471" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="118" id="PfS-HP-gTs"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                            <state key="normal" title="加入购物车">
+                                <color key="titleColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <color key="titleShadowColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+                            </state>
+                            <connections>
+                                <action selector="selectedOkBtnAction:" destination="-1" eventType="touchUpInside" id="yGp-2g-f64"/>
+                            </connections>
+                        </button>
+                        <imageView contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ShoppingCar" translatesAutoresizingMaskIntoConstraints="NO" id="fHs-gU-YWl">
+                            <rect key="frame" x="16.5" y="9.5" width="30" height="30"/>
+                            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="30" id="0ED-dV-OGP"/>
+                                <constraint firstAttribute="height" constant="30" id="ytP-X0-UtX"/>
+                            </constraints>
+                        </imageView>
+                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="99" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cRn-T6-1zo">
+                            <rect key="frame" x="40.5" y="3.5" width="18" height="18"/>
+                            <color key="backgroundColor" red="0.97254901960784312" green="0.14117647058823529" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="18" id="STr-y2-hZI"/>
+                                <constraint firstAttribute="width" constant="18" id="jfA-QT-0Rh"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" type="system" pointSize="11"/>
+                            <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                    </subviews>
+                    <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <constraints>
+                        <constraint firstItem="cRn-T6-1zo" firstAttribute="centerY" secondItem="isj-h7-rna" secondAttribute="centerY" constant="-12" id="BxC-cv-Xaj"/>
+                        <constraint firstItem="fHs-gU-YWl" firstAttribute="leading" secondItem="isj-h7-rna" secondAttribute="leading" constant="16.5" id="EMF-HB-bdf"/>
+                        <constraint firstItem="W5Q-bV-Umh" firstAttribute="centerY" secondItem="isj-h7-rna" secondAttribute="centerY" id="OAX-Qp-DRf"/>
+                        <constraint firstItem="fHs-gU-YWl" firstAttribute="centerY" secondItem="isj-h7-rna" secondAttribute="centerY" id="Po9-Hm-4Ha"/>
+                        <constraint firstItem="cRn-T6-1zo" firstAttribute="trailing" secondItem="fHs-gU-YWl" secondAttribute="trailing" constant="12" id="VnG-WE-xZ1"/>
+                        <constraint firstAttribute="trailing" secondItem="W5Q-bV-Umh" secondAttribute="trailing" id="WjI-ta-0rM"/>
+                        <constraint firstAttribute="trailing" secondItem="ANd-zn-N19" secondAttribute="trailing" id="bJF-RU-mbV"/>
+                        <constraint firstAttribute="height" constant="49" id="bux-Im-2Ko"/>
+                        <constraint firstItem="W5Q-bV-Umh" firstAttribute="height" secondItem="isj-h7-rna" secondAttribute="height" id="cLg-my-PMZ"/>
+                        <constraint firstItem="ANd-zn-N19" firstAttribute="top" secondItem="isj-h7-rna" secondAttribute="top" id="f5j-ki-pXK"/>
+                        <constraint firstItem="ANd-zn-N19" firstAttribute="centerX" secondItem="isj-h7-rna" secondAttribute="centerX" id="nIR-el-tje"/>
+                        <constraint firstItem="ANd-zn-N19" firstAttribute="leading" secondItem="isj-h7-rna" secondAttribute="leading" id="smo-bK-aqW"/>
+                    </constraints>
+                </view>
+            </subviews>
+            <color key="backgroundColor" red="0.95079368352890015" green="0.95138615369796753" blue="0.93127834796905518" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+                <constraint firstItem="EgV-uo-vFa" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="-20" id="2RU-z4-7bP"/>
+                <constraint firstAttribute="bottom" secondItem="isj-h7-rna" secondAttribute="bottom" id="8Ec-mN-Ds7"/>
+                <constraint firstItem="isj-h7-rna" firstAttribute="top" secondItem="EgV-uo-vFa" secondAttribute="bottom" id="dYK-bR-5rM"/>
+                <constraint firstItem="isj-h7-rna" firstAttribute="top" secondItem="EgV-uo-vFa" secondAttribute="bottom" id="faD-aX-98M"/>
+                <constraint firstItem="EgV-uo-vFa" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="gbd-3n-csW"/>
+                <constraint firstItem="isj-h7-rna" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="zNo-sT-6yx"/>
+                <constraint firstAttribute="trailing" secondItem="EgV-uo-vFa" secondAttribute="trailing" id="zSb-Nj-6Q1"/>
+                <constraint firstAttribute="trailing" secondItem="isj-h7-rna" secondAttribute="trailing" id="ztU-ba-Fzc"/>
+            </constraints>
+            <point key="canvasLocation" x="285" y="326"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="ShoppingCar" width="60" height="60"/>
+    </resources>
+</document>

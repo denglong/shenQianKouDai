@@ -1,0 +1,444 @@
+//
+//  HomeApiModel.m
+//  KingProFrame
+//
+//  Created by denglong on 3/2/16.
+//  Copyright © 2016 king. All rights reserved.
+//
+
+#import "HomeApiModel.h"
+#import "ShopCartController.h"
+#import "TabBarController.h"
+
+@implementation HomeApiModel
+@synthesize client, homeModel, cartModel, shopBtnView;
+
+//初始化单例
++ (HomeApiModel *)sharedInstance
+{
+    static HomeApiModel *sharedAccountManagerInstance = nil;
+    static dispatch_once_t predicate;
+    dispatch_once(&predicate, ^{
+        sharedAccountManagerInstance = [[self alloc] init];
+        [sharedAccountManagerInstance addProgRessHUD];
+    });
+    return sharedAccountManagerInstance;
+}
+
+#pragma mark - 获取首页信息的请求
+- (void)getHomeInfoRequest {
+    client = [CloudClient getInstance];
+    
+    NSString *pageWidth = [NSString stringWithFormat:@"%d", (int)viewWidth];
+    NSString *pageHeight = [NSString stringWithFormat:@"%d", (int)kViewHeight];
+//    NSString *cid = [GeTuiSdk clientId];
+//    if (![DataCheck isValidString:cid])
+//    {
+//        cid = @"";
+//    }
+    
+    NSDictionary *params = @{@"pageWidth":pageWidth, @"pageHeight":pageHeight};
+
+    [client requestMethodWithMod:@"home/getHomeInfo"
+                          params:nil
+                      postParams:params
+                        delegate:self
+                        selector:@selector(getHomeInfoFinish:)
+                   errorSelector:@selector(getHomeInfoError:)
+                progressSelector:nil];
+}
+
+- (void)getHomeInfoFinish:(NSDictionary *)response
+{
+    if ([DataCheck isValidDictionary:response])
+    {
+        NSDictionary *userInfoDic = [self formatSpecialArray:[response objectForKey:@"userInfoList"]];
+        NSDictionary *configDic = [self formatSpecialArray:[response objectForKey:@"config"]];
+        NSMutableDictionary *respDic = [response mutableCopy];
+        
+        [respDic setObject:userInfoDic forKey:@"userInfoList"];
+        [respDic setObject:configDic forKey:@"config"];
+        
+        homeModel = [HomeModel mj_objectWithKeyValues:respDic];
+        
+        [[CommClass sharedCommon] setObject:homeModel.configModel.caigouShow forKey:CAIGOUSHOW];
+        [[CommClass sharedCommon] setObject:homeModel.configModel.caigouUrl forKey:CAIGOUURL];
+        
+        //启动页显示时间
+        [[NSUserDefaults standardUserDefaults] setObject:homeModel.configModel.startPageMs forKey:SHOWPAGEMS];
+        
+        [[CommClass sharedCommon] setObject:homeModel.configModel.isRecomShow forKey:@"isRecomShow"];
+        //启动页保存
+        [self saveLoadImage:homeModel.configModel.startPageUrl];
+        NSString *shopCancelAlert = homeModel.configModel.shopCancelAlert;
+        [[CommClass sharedCommon] setObject:shopCancelAlert forKey:SHOPCANCELALERT];
+        
+        //更新购物车数据
+        NSDictionary *cartInfo = [response objectForKey:@"cartInfo"];
+        cartModel = [ShoppingCartModel shareModel];
+        shopBtnView = [ShopBtnView shareShopBtnView];
+        if ([UserLoginModel isAverageUser])
+        {
+            [cartModel updateShoppingCartInfo:cartInfo];
+        }
+        if ([[cartInfo objectForKey:@"cartNumber"] integerValue] > 0 && [UserLoginModel isAverageUser])
+        {
+            shopBtnView.goodsNumLab.hidden = NO;
+            if ([[cartInfo objectForKey:@"cartNumber"] integerValue] > 99) {
+                shopBtnView.goodsNumLab.text = [NSString stringWithFormat:@"···"];
+            }
+            else
+            {
+                shopBtnView.goodsNumLab.text = [NSString stringWithFormat:@"%@", [cartInfo objectForKey:@"cartNumber"]];
+            }
+        }
+        else
+        {
+            shopBtnView.goodsNumLab.hidden = YES;
+        }
+        
+        [self.delegate homeResponseData:YES Response:response model:homeModel type:1];
+    }
+}
+
+- (void)getHomeInfoError:(NSDictionary *)response
+{
+    [self.delegate homeResponseData:NO Response:response model:nil type:1];
+}
+
+#pragma mark - 加入购物车接口
+- (void)addCartGoodAction:(NSString *)goodsId {
+    
+    [self showHUD];
+    NSDictionary *params = @{@"goodsId":goodsId, @"number":@"1"};
+    [client requestMethodWithMod:@"cart/addCart"
+                          params:nil
+                      postParams:params
+                        delegate:self
+                        selector:@selector(addCartGoodFinish:)
+                   errorSelector:@selector(addCartGoodFiled:)
+                progressSelector:nil];
+}
+
+- (void)addCartGoodFinish:(NSDictionary *)response {
+    
+    [self hidenHUD];
+    NSString *number = response[@"cartInfo"][@"cartNumber"];
+    [[TabBarController sharedInstance] setShopCartNumberAction:number];
+}
+
+- (void)addCartGoodFiled:(NSDictionary *)response {
+    [self hidenHUD];
+    [SRMessage infoMessage:@"加入购物车失败！"];
+}
+
+#pragma mark - 获取购物车合计数据 
+- (void)getCartTotalData {
+    client = [CloudClient getInstance];
+    [client requestMethodWithMod:@"cart/getCartInfo"
+                                params:nil
+                            postParams:nil
+                              delegate:self
+                              selector:@selector(getCartTotalFinish:)
+                         errorSelector:nil
+                      progressSelector:nil];
+}
+
+- (void)getCartTotalFinish:(NSDictionary *)response {
+    if ([DataCheck isValidDictionary:response])
+    {
+        cartModel = [ShoppingCartModel shareModel];
+        shopBtnView = [ShopBtnView shareShopBtnView];
+        //更新购物车数据
+        NSDictionary *cartInfo = [response objectForKey:@"cartInfo"];
+        [cartModel updateShoppingCartInfo:cartInfo];
+        if ([[cartInfo objectForKey:@"cartNumber"] integerValue] > 0)
+        {
+            shopBtnView.goodsNumLab.hidden = NO;
+            if ([[cartInfo objectForKey:@"cartNumber"] integerValue] > 99) {
+                shopBtnView.goodsNumLab.text = [NSString stringWithFormat:@"···"];
+            }
+            else
+            {
+                shopBtnView.goodsNumLab.text = [NSString stringWithFormat:@"%@", [cartInfo objectForKey:@"cartNumber"]];
+            }
+        }
+        else
+        {
+            shopBtnView.goodsNumLab.hidden = YES;
+        }
+        
+        NSArray *goodsList = [response objectForKey:@"goodsList"];
+        if (goodsList.count == 0) {
+            cartModel.shopInfos = [NSArray array];
+        }
+        else
+        {
+            cartModel.shopInfos = [response objectForKey:@"goodsList"];
+        }
+        
+        NSString *number = response[@"cartInfo"][@"cartNumber"];
+        [[TabBarController sharedInstance] setShopCartNumberAction:number];
+    }
+    
+    [self.delegate homeResponseData:YES Response:response model:nil type:2];
+}
+
+- (void)getUpData {
+    client = [CloudClient getInstance];
+    NSString *clientVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
+    NSDictionary *params = @{@"versionType":@"2", @"versionCode":clientVersion};
+    
+    [client requestMethodWithMod:@"setting/version"
+                                params:nil
+                            postParams:params
+                              delegate:self
+                              selector:@selector(getUpDataFinish:)
+                         errorSelector:@selector(getUpDataError:)
+                      progressSelector:nil];
+}
+
+- (void)getUpDataFinish:(NSDictionary *)response {
+    if ([DataCheck isValidDictionary:response])
+    {
+        if ([response objectForKey:@"nextDate"])
+        {
+            [self saveUpdataTime:[response objectForKey:@"nextDate"]];
+        }
+        else
+        {
+            [self saveUpdataTime:@"7"];
+        }
+        
+        NSInteger code = [[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"] integerValue];
+        if (code < [[response objectForKey:@"code"] integerValue])
+        {
+            if ([[response objectForKey:@"isUpde"] integerValue] == 1)
+            {
+                [SRMessage infoMessageOk:[response objectForKey:@"msg"] block:^{
+                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:[response objectForKey:@"path"]]];
+                }];
+            }
+            else if ([[response objectForKey:@"isUpde"] integerValue] == 2)
+            {
+                [SRMessage infoMessage:[response objectForKey:@"msg"] block:^{
+                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:[response objectForKey:@"path"]]];
+                }];
+            }
+            else
+            {
+                return;
+            }
+        }
+    }
+}
+
+- (void)getUpDataError:(NSDictionary *)response {
+    
+}
+
+#pragma mark - 首页订单助手轮询接口
+- (void)orderLoopAction {
+    client = [CloudClient getInstance];
+    [client requestMethodWithMod:@"order/newState"
+                                params:nil
+                            postParams:nil
+                              delegate:self
+                              selector:@selector(loopDataFinish:)
+                         errorSelector:nil
+                      progressSelector:nil];
+}
+
+- (void)loopDataFinish:(NSDictionary *)response {
+    if ([DataCheck isValidDictionary:response]) {
+        [self.delegate homeResponseData:YES Response:response model:nil type:3];
+    }
+}
+
+#pragma mark - 用户位置信息接口
+- (void)setUserLocation {
+    client = [CloudClient getInstance];
+    
+    NSArray *addList = [[CommClass sharedCommon] localObjectForKey:AUTOLOCATIONADDRESS];
+    
+    NSString *lat = @"";
+    NSString *lng = @"";
+    if (addList.count > 2) {
+        lat = addList[1][@"lat"];
+        lng = addList[1][@"lng"];
+    }
+    NSString *testUUID = [NSString stringWithFormat:@"maiyar_%@", [self getDeviceId]];
+//    NSString *token = [[CommClass sharedCommon] objectForKey:LOGGED_TOKEN];
+    
+    NSDictionary *params = @{@"lat":lat,
+                             @"lng":lng,
+                             @"cityCode":addList.firstObject?addList.firstObject:@"",
+                             @"imei":testUUID?testUUID:@"",
+                             @"userId":@"",
+                             @"poi":addList.lastObject?addList.lastObject:@""};
+    
+    [client requestMethodWithMod:@"home/setLocation"
+                          params:nil
+                      postParams:params
+                        delegate:self
+                        selector:@selector(getShopNumDataFinish:)
+                   errorSelector:@selector(getAhopNumDataFiled:)
+                progressSelector:nil];
+}
+
+- (void)getShopNumDataFinish:(NSDictionary *)response {
+    
+}
+
+- (void)getAhopNumDataFiled:(NSDictionary *)response {
+
+}
+
+#pragma mark - 获取设备uuid
+- (NSString *)getDeviceId
+{
+    NSUUID * currentDeviceUUID  = [UIDevice currentDevice].identifierForVendor;
+    NSString * currentDeviceUUIDStr = currentDeviceUUID.UUIDString;
+    currentDeviceUUIDStr = [currentDeviceUUIDStr stringByReplacingOccurrencesOfString:@"-" withString:@""];
+    currentDeviceUUIDStr = [currentDeviceUUIDStr lowercaseString];
+    
+    return currentDeviceUUIDStr;
+}
+
+- (void)saveUpdataTime:(NSString *)nextDate {
+    NSMutableDictionary *data = [NSMutableDictionary dictionary];
+    
+    //获取系统当前时间
+    NSDate *senddate=[NSDate date];
+    NSDateFormatter *dateformatter=[[NSDateFormatter alloc] init];
+    [dateformatter setDateFormat:@"YYYYMMdd"];
+    NSString *locationString=[dateformatter stringFromDate:senddate];
+    
+    [data setObject:locationString forKey:@"oldTime"];
+    [data setObject:nextDate forKey:@"nextDate"];
+    
+    //获取应用程序沙盒的Documents目录
+    NSArray *paths=NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask,YES);
+    NSString *plistPath = [paths objectAtIndex:0];
+    
+    //得到完整的文件名
+    NSString *filename=[plistPath stringByAppendingPathComponent:@"myOldTime.plist"];
+    //输入写入
+    [data writeToFile:filename atomically:YES];
+}
+
+- (void)saveLoadImage:(NSString *)url {
+    //将上述数据全部存储到NSUserDefaults中
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSString *oldUrl = [userDefaults objectForKey:@"imageUrlStr"];
+    if (![url isEqualToString:oldUrl])
+    {
+        NSData *imageData = [NSData dataWithContentsOfURL:[NSURL URLWithString:url]];
+        [userDefaults setObject:imageData forKey:@"imageData"];
+        [userDefaults setObject:url forKey:@"imageUrlStr"];
+        [userDefaults synchronize];
+    }
+}
+
+/**
+ * Method name: formatCartInfo
+ * Description: 格式化特殊数组为可用字典  type  value
+ * Parameter: specialArray
+ */
+-(NSDictionary*)formatSpecialArray:(NSArray*)specialArray{
+    
+    NSMutableDictionary *mutableInfo = [NSMutableDictionary dictionary];
+    
+    NSDictionary *resultsDic=[NSDictionary dictionary];
+    
+    if (![DataCheck isValidArray:specialArray]) {
+        return resultsDic;
+    }
+    
+    NSString *newKey=nil;
+    NSString *newValue=nil;
+    
+    for (int i=0; i<[specialArray count]; i++) {
+        
+        NSDictionary * cartDic=[specialArray objectAtIndex:i];
+        
+        for (NSString* key in cartDic) {
+            
+            NSString*value=[cartDic objectForKey:key];
+            
+            if ([DataCheck isValidNumber:value]) {
+                value=[NSString stringWithFormat:@"%@",value];
+            }
+            if (![DataCheck isValidString:value] &&![DataCheck isValidArray:value]) {
+                value = @"";
+            }
+            
+            if ([key isEqualToString:@"type"]) {
+                
+                newKey=value;
+            }
+            else if([key isEqualToString:@"value"]){
+                newValue=value;
+            }
+            
+            if (newKey!=nil &&newValue!=nil) {
+                
+                [mutableInfo setObject:newValue forKey:newKey];
+                newValue=nil;
+                newKey=nil;
+            }
+        }
+        resultsDic=(NSDictionary*)mutableInfo;
+    }
+    
+    return resultsDic;
+}
+
+//添加时间进度圈
+- (void)addProgRessHUD{
+    UIWindow *window = [UIApplication sharedApplication].keyWindow;
+    _HUD = [[MBProgressHUD alloc] initWithView:window];
+    [window addSubview:_HUD];
+}
+
+- (void)showHUD {
+    [_HUD show:YES];
+    _myTimer = [NSTimer scheduledTimerWithTimeInterval:15.0 target:self selector:@selector(timeOutAction:) userInfo:nil repeats:NO];
+}
+
+- (void)timeOutAction:(id)sender {
+    [self hidenHUD];
+}
+
+- (void)hidenHUD {
+    [_HUD hide:YES];
+    [_myTimer invalidate];
+    _myTimer = nil;
+}
+
+#pragma mark - getInfo
+-(void)getMyInfoData
+{
+    client = [CloudClient getInstance];
+    [client requestMethodWithMod:@"member/getUserInfo"
+                    params:nil
+                postParams:nil
+                  delegate:self
+                  selector:@selector(getMyInfoSuccessed:)
+             errorSelector:@selector(getMyInfoError:)
+          progressSelector:nil];
+    
+}
+-(void)getMyInfoSuccessed:(NSDictionary *)response
+{
+    NSArray * userInfoArray =[response objectForKey:@"profileList"];
+    for (int i = 0; i<userInfoArray.count; i++) {
+        [MyInfoModel setClassEmue:[userInfoArray objectAtIndex:i]];
+    }
+}
+-(void)getMyInfoError:(NSDictionary *)response
+{
+    
+}
+
+@end

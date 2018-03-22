@@ -1,0 +1,138 @@
+//
+//  TabBarController.m
+//  KingProFrame
+//
+//  Created by JinLiang on 15/7/1.
+//  Copyright (c) 2015年 king. All rights reserved.
+//
+
+#import "TabBarController.h"
+#import "ShopCartViewController.h"
+#import "WLZ_ShoppingCarController.h"
+#import "BusinessOrderController.h"
+#import "DistributionViewController.h"
+#import "HomeViewController.h"
+#import "NavigationController.h"
+#import "Headers.h"
+#import "MyViewController.h"
+#import "CategoryController.h"
+#import "MyOrderController.h"
+#import "HomeViewController.h"
+
+@interface TabBarController ()
+
+@end
+
+@implementation TabBarController
+
+//初始化单例
++ (TabBarController *)sharedInstance
+{
+    static TabBarController *sharedAccountManagerInstance = nil;
+    static dispatch_once_t predicate;
+    dispatch_once(&predicate, ^{
+        sharedAccountManagerInstance = [[self alloc] init];
+    });
+    return sharedAccountManagerInstance;
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+
+    [self createPageAction];
+}
+
+#pragma mark - tabBar初始化
+- (void)createPageAction {
+    
+    //设置状态栏属性
+    UIApplication *application = [UIApplication sharedApplication];
+    [application setStatusBarHidden:NO withAnimation:UIStatusBarAnimationNone];
+    
+    NSArray *titles = @[@"首页",@"分类",@"购物车",@"订单",@"我的"];
+    NSArray *images = @[@"icon_homeBar",@"icon_purchaseBar",
+                        @"icon_shopCartImg",@"icon_messageBar",
+                        @"icon_myBar"];
+    NSArray *selectedImages = @[@"icon_homeBar_p",@"icon_purchaseBar_p",
+                                @"icon_shopCartImg_p", @"icon_messageBar_p",
+                                @"icon_myBar_p"];
+    
+    HomeViewController *homeControl = [[HomeViewController alloc] init];
+    
+    CategoryController *categoryControl=[[CategoryController alloc]initWithNibName:@"CategoryController" bundle:nil];
+    
+    ShopCartController *cartController = [[ShopCartController alloc] init];
+//    cartController.tabBarItem.badgeValue = @"6";
+    
+    MyOrderController *orderControl = [[MyOrderController alloc] init];
+    orderControl.statusNum = 0;
+    
+    MyViewController *myControl = [[MyViewController alloc] init];
+    
+    NSArray *controllers = @[homeControl, categoryControl, cartController, orderControl, myControl];
+    
+    for (int i = 0; i < controllers.count; i++) {
+        
+        UIViewController *childVc = controllers[i];
+        if (i == 3) {
+           childVc.title = @"我的订单";
+        }
+        else
+        {
+            childVc.title = titles[i];
+        }
+        
+        [self SetupChildVc:childVc
+                     title:titles[i]
+                     image:images[i]
+             selectedImage:selectedImages[i]];
+    }
+}
+
+- (void)SetupChildVc:(UIViewController *)childVc
+               title:(NSString *)title
+               image:(NSString *)imageName
+       selectedImage:(NSString *)selectedImageName{
+    
+    NavigationController *nav = [[NavigationController alloc] initWithRootViewController:childVc];
+    childVc.tabBarItem.image = UIIMAGEORIGINAL(imageName);
+    childVc.tabBarItem.selectedImage = UIIMAGEORIGINAL(selectedImageName);
+    nav.tabBarItem.title = title;
+    [self addChildViewController:nav];
+    
+    [childVc.tabBarItem setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:[UIColor blackColor],NSForegroundColorAttributeName, nil] forState:UIControlStateNormal];
+    [childVc.tabBarItem setTitlePositionAdjustment:UIOffsetMake(0, -3)];
+}
+
+#pragma mark - 设置购物车Number
+- (void)setShopCartNumberAction:(NSString *)number {
+    
+    ShopCartController *cart = self.viewControllers[2];
+    if ([number integerValue] > 0) {
+        cart.tabBarItem.badgeValue = [NSString stringWithFormat:@"%@", number];
+    }
+    else
+    {
+        cart.tabBarItem.badgeValue = 0;
+    }
+}
+
+#pragma mark - 退出登录清除购物车数量
+- (void)setShopCartNumberNil {
+    ShopCartController *cart = self.viewControllers[2];
+    cart.tabBarItem.badgeValue = 0;
+}
+
+#pragma mark - tabBar点击代理
+- (void)tabBar:(UITabBar *)tabBar didSelectItem:(UITabBarItem *)item {
+    
+    if ([item.title isEqualToString:@"购物车"] || [item.title isEqualToString:@"订单"]) {
+        
+//        if (![UserLoginModel isLogged]) {
+//            [[AppModel sharedModel] presentLoginController:self];
+//            return;
+//        }
+    }
+}
+
+@end

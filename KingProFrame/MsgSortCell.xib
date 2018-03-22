@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="9060" systemVersion="15A284" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9051"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" rowHeight="75" id="KGk-i7-Jjw" customClass="MsgSortCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="75"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="74"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="0ig-J4-o9c">
+                        <rect key="frame" x="15" y="12" width="50" height="50"/>
+                        <animations/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="50" id="PzK-Bc-cxf"/>
+                            <constraint firstAttribute="width" constant="50" id="SUX-Hn-0uF"/>
+                        </constraints>
+                    </imageView>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="e豆消息" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XoW-6F-4EA">
+                        <rect key="frame" x="90" y="15" width="47" height="16"/>
+                        <animations/>
+                        <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                        <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="L4o-rW-jpG">
+                        <rect key="frame" x="305" y="15" width="0.0" height="0.0"/>
+                        <animations/>
+                        <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                        <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="您有一条新消息" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="43T-az-za7">
+                        <rect key="frame" x="90" y="44" width="215" height="15"/>
+                        <animations/>
+                        <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                        <color key="textColor" red="0.40000000000000002" green="0.40000000000000002" blue="0.40000000000000002" alpha="1" colorSpace="calibratedRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                </subviews>
+                <animations/>
+                <constraints>
+                    <constraint firstAttribute="trailing" secondItem="L4o-rW-jpG" secondAttribute="trailing" constant="15" id="4lm-MR-9Sv"/>
+                    <constraint firstItem="XoW-6F-4EA" firstAttribute="leading" secondItem="0ig-J4-o9c" secondAttribute="trailing" constant="25" id="Cgp-yc-seX"/>
+                    <constraint firstItem="0ig-J4-o9c" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="15" id="ItG-pV-D0S"/>
+                    <constraint firstItem="43T-az-za7" firstAttribute="leading" secondItem="XoW-6F-4EA" secondAttribute="leading" id="KQ4-Dw-vVI"/>
+                    <constraint firstItem="L4o-rW-jpG" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="15" id="iMj-9n-vWF"/>
+                    <constraint firstAttribute="trailing" secondItem="43T-az-za7" secondAttribute="trailing" constant="15" id="mkz-4j-Vsx"/>
+                    <constraint firstAttribute="bottom" secondItem="43T-az-za7" secondAttribute="bottom" constant="15" id="nXz-vr-PIL"/>
+                    <constraint firstItem="XoW-6F-4EA" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="15" id="o0U-OA-A9F"/>
+                    <constraint firstItem="0ig-J4-o9c" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="ppt-8S-8PQ"/>
+                </constraints>
+            </tableViewCellContentView>
+            <animations/>
+            <connections>
+                <outlet property="msgSortContent" destination="43T-az-za7" id="FH8-BE-PjT"/>
+                <outlet property="msgSortImage" destination="0ig-J4-o9c" id="Ntg-Hy-0lj"/>
+                <outlet property="msgSortTime" destination="L4o-rW-jpG" id="yML-1Z-gDI"/>
+                <outlet property="msgSortTitle" destination="XoW-6F-4EA" id="lPS-EF-Tis"/>
+            </connections>
+            <point key="canvasLocation" x="443" y="277"/>
+        </tableViewCell>
+    </objects>
+</document>

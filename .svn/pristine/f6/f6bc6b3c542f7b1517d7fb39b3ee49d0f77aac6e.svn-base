@@ -1,0 +1,26 @@
+//
+//  CommodityCollectionViewCell.m
+//  KingProFrame
+//
+//  Created by lihualin on 15/8/19.
+//  Copyright (c) 2015年 king. All rights reserved.
+//
+
+#import "CommodityCollectionViewCell.h"
+#import "Headers.h"
+@implementation CommodityCollectionViewCell
+
+- (void)awakeFromNib {
+    [super awakeFromNib];
+}
+
+-(void)setGoods:(goodsModel *)goods
+{
+    NSURL * url = [NSURL URLWithString:goods.goodsPic];
+    self.commodityImageView.contentMode = UIViewContentModeScaleAspectFit;
+    [self.commodityImageView setImageWithURL:url placeholderImage:[UIImage imageNamed:@"orderShopHeader"]];
+    
+    self.commodityNameLabel.text = goods.goodsName;
+    self.commodityPricelabel.text = [NSString stringWithFormat:@"￥%.2f",goods.goodsPrice];
+}
+@end

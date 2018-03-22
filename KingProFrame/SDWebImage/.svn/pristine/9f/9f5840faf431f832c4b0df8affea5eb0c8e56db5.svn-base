@@ -1,0 +1,15 @@
+Trying to add new property 'svn:ignore'
+but the property already exists.
+<<<<<<< (local property value)
+UIImageView+HighlightedWebCache.h
+UIImageView+HighlightedWebCache.m
+UIView+WebCacheOperation.h
+UIView+WebCacheOperation.m
+=======
+UIImageView+AnimationForSDWebImage.h
+UIImageView+AnimationForSDWebImage.m
+UIImageView+HighlightedWebCache.h
+UIImageView+HighlightedWebCache.m
+UIView+WebCacheOperation.h
+UIView+WebCacheOperation.m
+>>>>>>> (incoming property value)

@@ -1,0 +1,80 @@
+//
+//  OrderDetailFootCell.m
+//  KingProFrame
+//
+//  Created by lihualin on 15/8/6.
+//  Copyright (c) 2015年 king. All rights reserved.
+//
+
+#import "OrderDetailFootCell.h"
+#import "Headers.h"
+@implementation OrderDetailFootCell
+
+- (void)awakeFromNib {
+    // Initialization code
+}
+
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
+    [super setSelected:selected animated:animated];
+
+    // Configure the view for the selected state
+}
+-(void)setOrderDetail:(OrderDetail *)orderDetail
+{
+    if (orderDetail == nil) {
+        return;
+    }
+    //姓名
+    self.nameLabel.text = orderDetail.addressUser;
+    //电话
+    self.phonelabel.text = orderDetail.addressTel;
+   
+//    NSString * address =  [NSString stringWithFormat:@"%@%@%@",orderDetail.street,orderDetail.address,orderDetail.addressDetail];
+    NSString *address = orderDetail.address;//orderDetail.address;//[address stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+   
+    self.addressLabel.text = address;
+    self.addressLabel.numberOfLines = 2;
+    [self.addressLabel sizeToFit];
+    if (orderDetail.orderStatus == 1) {
+        self.payView.hidden = YES;
+        self.timeConstraint.constant = 0;
+    }else{
+        self.payView.hidden = NO;
+        self.timeConstraint.constant = 21;
+        if ([orderDetail.shippingType integerValue] == 1) {
+            self.kindLabel.text = @"送货上门";
+        }else if (orderDetail.payType == 2) {
+            self.kindLabel.text = @"到店自提";
+        }
+    }
+    if ([DataCheck isValidString:orderDetail.orderNo]) {
+//        NSString *myDate = orderDetail.createTime;
+//        self.timeOrderlabel.text = [CommClass formatIntiTimeStamp:myDate timeFormat:@"yyyy-MM-dd HH:mm:ss"];
+        self.timeLabel.text = orderDetail.orderNo;
+    }
+//    NSString * userdeliveryTime = [NSString stringWithFormat:@"%@",orderDetail.userDeliveryTime];
+//    if ([DataCheck isValidString:userdeliveryTime]) {
+//        if (orderDetail.yushou == 1) {
+//            //预售商品订单 送达时间只显示年月日
+//            self.timeLabel.text = [CommClass formatIntiTimeStamp:userdeliveryTime timeFormat:@"yyyy-MM-dd"];
+//        }else{
+//            self.timeLabel.text = [CommClass formatIntiTimeStamp:userdeliveryTime timeFormat:@"yyyy-MM-dd HH:mm:ss"];
+//        }
+//    }
+    CGSize size =[CommClass getSuitSizeWithString:address font:12 bold:NO sizeOfX:viewWidth-90-15];
+    if (orderDetail.orderStatus == 6 && orderDetail.cancelStatus == 5 && orderDetail.refundStatus == 2) {
+        self.remarkView.hidden = NO;
+        NSString *myDate = orderDetail.cancelTime;
+        self.remarkLabel.text = [CommClass formatIntiTimeStamp:myDate timeFormat:@"yyyy-MM-dd HH:mm:ss"];
+        self.frame = CGRectMake(self.frame.origin.x, self.frame.origin.y, self.frame.size.width, CGRectGetMaxY(self.remarkView.frame)+10 + size.height);
+    }else {
+        self.remarkView.hidden = YES;
+        self.frame = CGRectMake(self.frame.origin.x, self.frame.origin.y, self.frame.size.width, CGRectGetMaxY(self.detailView.frame)+10 + size.height);
+    }
+    if (orderDetail.orderStatus == 1) {
+        self.frame = CGRectMake(self.frame.origin.x, self.frame.origin.y, self.frame.size.width, CGRectGetMaxY(self.detailView.frame) - 21 + size.height);
+    }
+}
+
+
+@end

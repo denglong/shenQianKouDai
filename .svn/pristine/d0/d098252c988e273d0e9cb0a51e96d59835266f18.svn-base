@@ -1,0 +1,519 @@
+//
+//  AddressMapViewController.m
+//  KingProFrame
+//
+//  Created by lihualin on 15/8/4.
+//  Copyright (c) 2015年 king. All rights reserved.
+//
+
+#import "AddressMapViewController.h"
+#import "SearchAddressHeaderCell.h"
+#import "SearchAddressCell.h"
+#import "MyAddressCell.h"
+#import "AroudAddressCell.h"
+#import "AddressReqModel.h"
+#define LAST_LATITUDE @"LAST_LATITUDE"
+#define LAST_LONGITUDE @"LAST_LONGITUDE"
+
+@interface AddressMapViewController ()<reloadDelegate>
+{
+    MAMapView * _mapView;
+    AMapSearchAPI * _search;
+//    MAPointAnnotation *pointAnnotation;
+    NSMutableArray *searchResult;
+    NSString * city;
+    NSMutableArray * list;
+    NSDictionary * localAddress;
+    UIView * noNetWork;
+//    AMapPlaceSearchRequest * poirequest;
+//    AMapPlaceSearchRequest * keyWordsRequest;
+    AMapReGeocodeSearchRequest *regeo;
+    NSInteger comeSearch;
+    NSInteger  pageNum;
+}
+@property (weak, nonatomic) IBOutlet UIView *mapViews;
+@property (weak, nonatomic) IBOutlet UIImageView *annoiImageView;
+- (IBAction)backUserLocation:(id)sender;
+@end
+
+@implementation AddressMapViewController
+@synthesize serchBar;
+-(void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    [MobClick beginLogPageView:NSStringFromClass([self class])];
+    [self.navigationController.navigationBar addSubview:serchBar];
+    [self noNetwork];
+    
+}
+
+-(void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+    [MobClick endLogPageView:NSStringFromClass([self class])];
+    [self showLocalTableView];
+    [serchBar removeFromSuperview];
+    
+}
+-(void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    _mapView.showsUserLocation = NO;
+    [_mapView removeFromSuperview];
+    _mapView = nil;
+    _search = nil;
+    regeo = nil;
+//    poirequest = nil;
+//    keyWordsRequest = nil;
+}
+//无网判断添加页面
+- (void)noNetwork {
+    if ([self isNotNetwork]) {
+        _mapView.hidden = YES;
+         self.localTableView.hidden = YES;
+        noNetWork = [NoNetworkView sharedInstance].view;
+        noNetWork.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
+        [NoNetworkView sharedInstance].reloadDelegate =self;
+        [self.view addSubview:noNetWork];
+        return;
+    }
+    else
+    {
+        _mapView.hidden = NO;
+        [noNetWork removeFromSuperview];
+        _mapView.showsUserLocation = YES;
+        self.localTableView.hidden = NO;
+    }
+}
+-(void)reloadAgainAction
+{
+    [self noNetwork];
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view from its nib.
+//    CGRectMake(40, 0, self.navigationController.navigationBar.frame.size.width-60, 44)
+    serchBar = [[UISearchBar alloc]initWithFrame:CGRectMake(40, 0, self.navigationController.navigationBar.frame.size.width-60, 44)];
+    serchBar.searchBarStyle = UISearchBarStyleDefault;
+    
+    serchBar.tintColor = [UIColor_HEX colorWithHexString:@"#323232"];
+    serchBar.delegate = self;
+    serchBar.placeholder = @"请输入学校、写字楼、小区、街道";
+    
+    
+    [super setExtraCellLineHidden:self.localTableView];
+    [super setExtraCellLineHidden:self.searchTableView];
+    [super setUpFooterRefresh:self.localTableView];
+   
+    _mapView = [[MAMapView alloc]initWithFrame:CGRectMake(0, 0, CGRectGetWidth(self.mapViews.bounds), CGRectGetHeight(self.mapViews.bounds))];
+    _mapView.delegate = self;
+    _mapView.showsUserLocation = YES;
+    
+    [_mapView setUserTrackingMode:MAUserTrackingModeFollow animated:YES];
+    //    _mapView.showTraffic = YES;//显示交通路况
+    [self.mapViews insertSubview:_mapView belowSubview:self.annoiImageView];
+    //初始化检索对象
+    _search = [[AMapSearchAPI alloc]init];
+    _search.delegate = self;
+    _search.language = 0;
+    searchResult=[[NSMutableArray alloc]init];
+    comeSearch = 2;
+   list = [[NSMutableArray alloc]init];
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+-(void)footerRereshing
+{
+    if (self.searchTableView.hidden == YES) {
+        if (pageNum == 1) {
+            pageNum = 2;
+            if (list.count > 6) {
+                [self.localTableView reloadData];
+            }
+        }
+    }else{
+        pageNum++;
+        [self keySearch:pageNum];
+    }
+    [self.refreshFooterView endRefreshing];
+}
+
+#pragma mark - map
+
+-(void)mapView:(MAMapView *)mapView didUpdateUserLocation:(MAUserLocation *)userLocation updatingLocation:(BOOL)updatingLocation
+{
+    if (![DataCheck isValidString:city]) {
+        city = @"029";
+    if (updatingLocation) {
+       
+        //设置位置
+        MACoordinateSpan span = MACoordinateSpanMake(0.005, 0.005);
+        MACoordinateRegion region = MACoordinateRegionMake(userLocation.coordinate, span);
+        [_mapView setRegion:region animated:NO];
+        if ([DataCheck isValidDictionary:self.pointsDic]) {
+            CLLocation * location = [[CLLocation alloc]initWithLatitude:[[self.pointsDic objectForKey:@"lat"] floatValue] longitude:[[self.pointsDic objectForKey:@"lng"] floatValue]];
+            _mapView.centerCoordinate = location.coordinate;
+            [self getAddressInfo:location.coordinate];
+        }else{
+            _mapView.centerCoordinate = userLocation.coordinate;
+            [self getAddressInfo:userLocation.coordinate];
+        }
+        
+      
+      }
+   }
+}
+
+
+- (void)mapView:(MAMapView *)mapView regionDidChangeAnimated:(BOOL)animated
+{
+    CGPoint anipoint = CGPointMake(self.mapViews.centerX, self.mapViews.centerY);
+   
+//    if (!CGPointEqualToPoint(anipoint , point)) {
+        CGPoint anipoint1 = CGPointMake(anipoint.x, anipoint.y);
+        _mapView.centerCoordinate = [_mapView convertPoint:anipoint1 toCoordinateFromView:self.mapViews];
+        if (comeSearch != 2) {
+             [self getAddressInfo:_mapView.centerCoordinate];
+        }else{
+            comeSearch = 0;
+        }
+//    }
+}
+
+
+-(void)getAddressInfo:(CLLocationCoordinate2D)localCoordinate
+{
+    //构造AMapReGeocodeSearchRequest对象
+    if (regeo == nil) {
+        regeo = [[AMapReGeocodeSearchRequest alloc] init];
+    }
+    regeo.location = [AMapGeoPoint locationWithLatitude:localCoordinate.latitude
+                                              longitude:localCoordinate.longitude];
+    regeo.radius = 200;
+    regeo.requireExtension = YES;
+    //发起逆地理编码
+    [_search AMapReGoecodeSearch:regeo];
+}
+
+//实现逆地理编码的回调函数
+- (void)onReGeocodeSearchDone:(AMapReGeocodeSearchRequest *)request response:(AMapReGeocodeSearchResponse *)response
+{
+    if(response.regeocode != nil)
+    {
+        //通过AMapReGeocodeSearchResponse对象处理搜索结果
+        city = response.regeocode.addressComponent.citycode;
+        NSString * cityStr = response.regeocode.addressComponent.city;
+        if (![DataCheck isValidString:cityStr]) {
+            cityStr = response.regeocode.addressComponent.province;
+        }
+        NSString * address = [NSString stringWithFormat:@"%@%@%@",response.regeocode.addressComponent.city,response.regeocode.addressComponent.district,response.regeocode.addressComponent.township];
+        if (response.regeocode.addressComponent.streetNumber.location.latitude == 0.0) {
+             localAddress = @{@"area":address,@"address":response.regeocode.formattedAddress,@"location":request.location,@"cityCode":response.regeocode.addressComponent.citycode};
+        }else{
+             localAddress = @{@"area":address,@"address":response.regeocode.formattedAddress,@"location":response.regeocode.addressComponent.streetNumber.location,@"cityCode":response.regeocode.addressComponent.citycode};
+        }
+        
+        CLLocation *newLocation=[[CLLocation alloc]initWithLatitude:request.location.latitude
+                                                          longitude:request.location.longitude];
+        [self getArroudData:newLocation.coordinate];
+    }
+}
+
+-(void)getArroudData:(CLLocationCoordinate2D)localCoordinate
+{
+    //构造 AMapReGeocodeSearchRequest 对象,location 为必选项,radius 为可选项
+    AMapPOIAroundSearchRequest *request = [[AMapPOIAroundSearchRequest alloc] init];
+    
+    request.location = [AMapGeoPoint locationWithLatitude:localCoordinate.latitude longitude:localCoordinate.longitude];
+    request.requireExtension = YES;
+    request.sortrule            = 0;
+    //发起逆地理编码
+    [_search AMapPOIAroundSearch:request];
+}
+
+- (void)onPOISearchDone:(AMapPOISearchBaseRequest *)request response:(AMapPOISearchResponse *)response
+{
+    if (response.pois.count == 0) {
+        return;
+    }
+    if (request.sortrule == 0) {
+        [list removeAllObjects];
+        for (AMapPOI *p in response.pois) {
+            if (p.distance < 1000) {
+                NSString * area = [NSString stringWithFormat:@"%@%@%@",p.city,p.district,p.address];
+                NSDictionary * dic = @{@"area":area,@"address":p.name,@"location":p.location,@"cityCode":p.citycode};
+                [list addObject:dic];
+            }
+            
+        }
+        pageNum = 1;
+        if([DataCheck isValidArray:list]){
+            self.localTableView.hidden = NO;
+            [self.localTableView reloadData];
+        }
+    }else{
+        if (pageNum == 1) {
+            [searchResult removeAllObjects];
+        }
+        for (AMapPOI *p in response.pois) {
+            if (p.distance < 1000) {
+                NSString * area = [NSString stringWithFormat:@"%@%@%@",p.city,p.district,p.address];
+                NSDictionary * dic = @{@"area":area,@"address":p.name,@"location":p.location,@"cityCode":p.citycode};
+                [searchResult addObject:dic];
+            }
+            
+        }
+        [self.searchTableView reloadData];
+    }
+
+}
+
+- (void)searchRequest:(id)request didFailWithError:(NSError *)error
+{
+   
+}
+
+#pragma mark - tableView datasource
+
+-(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
+    
+    if (tableView == self.searchTableView) {
+        if ([DataCheck isValidArray:searchResult]) {
+            return searchResult.count;
+        }
+        return list.count+1;
+    }
+    
+    if (pageNum == 1) {
+        if (list.count > 6) {
+            return 6;
+        }
+       return list.count;
+    }
+    return list.count;
+}
+-(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return 1;
+}
+-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    UITableViewCell * cell =[self tableView:tableView cellForRowAtIndexPath:indexPath];
+    return cell.frame.size.height;
+}
+-(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
+    if (tableView == self.localTableView) {
+        return 0;
+    }
+    return 10;
+}
+
+-(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
+{
+    UIView * view = [[UIView alloc]initWithFrame:CGRectMake(0, 0, viewWidth, 10)];
+    view.backgroundColor = self.searchTableView.backgroundColor;
+    return view;
+}
+
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (tableView == self.searchTableView) {
+        if ([DataCheck isValidArray:searchResult]) {
+            Class class = [SearchAddressCell class];
+            NSString * indentifier = NSStringFromClass(class);
+            SearchAddressCell * cell = [tableView dequeueReusableCellWithIdentifier:indentifier];
+            if (cell == nil) {
+                cell = [[[NSBundle mainBundle] loadNibNamed:@"SearchAddressCell" owner:self options:nil] objectAtIndex:0];
+            }
+            NSDictionary * dic = [searchResult objectAtIndex:indexPath.section];
+            [cell setAddress:dic];
+            
+            return cell;
+        } else{
+            if (indexPath.section == 0) {
+                Class class = [SearchAddressHeaderCell class];
+                NSString * identifier=NSStringFromClass(class);
+                SearchAddressHeaderCell *cell=[tableView dequeueReusableCellWithIdentifier:identifier];
+                if (cell==nil) {
+                    cell= [[[NSBundle mainBundle] loadNibNamed:@"SearchAddressHeaderCell" owner:self options:nil] objectAtIndex:0];
+                    
+                }
+                cell.titleLabel.text= [localAddress objectForKey:@"address"];
+                cell.detailLabel.text = [localAddress objectForKey:@"area"];
+                return cell;
+            }else{
+                Class class = [SearchAddressCell class];
+                NSString * indentifier = NSStringFromClass(class);
+                SearchAddressCell * cell = [tableView dequeueReusableCellWithIdentifier:indentifier];
+                if (cell == nil) {
+                    cell = [[[NSBundle mainBundle] loadNibNamed:@"SearchAddressCell" owner:self options:nil] objectAtIndex:0];
+                }
+                NSDictionary * dic = [list objectAtIndex:indexPath.section-1];
+                [cell setAddress:dic];
+                return cell;
+            }
+        }
+
+    }else {
+        Class class = [AroudAddressCell class];
+        NSString * indentifier = NSStringFromClass(class);
+        AroudAddressCell * cell = [tableView dequeueReusableCellWithIdentifier:indentifier];
+        if (cell == nil) {
+            cell = [[[NSBundle mainBundle] loadNibNamed:@"AroudAddressCell" owner:self options:nil] objectAtIndex:0];
+        }
+        
+        NSDictionary * dic = [list objectAtIndex:indexPath.section];
+        [cell setAddress:dic];
+        if (indexPath.section == 0) {
+            cell.accessoryView = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"addressMapLocation"]];
+        }else{
+            cell.accessoryView = nil;
+        }
+        return cell;
+
+    }
+    
+}
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    NSDictionary * selectedAddress = [NSDictionary dictionary];
+    if (tableView == self.searchTableView) {
+        if ([DataCheck isValidArray:searchResult]) {
+//            selectedAddress = [searchResult objectAtIndex:indexPath.section];
+            localAddress = [searchResult objectAtIndex:indexPath.section];
+            [list removeAllObjects];
+            [list addObjectsFromArray:searchResult];
+        } else{
+            if (indexPath.section == 0) {
+//                selectedAddress = localAddress;
+            }else{
+//                selectedAddress = [list objectAtIndex:indexPath.section-1];
+                localAddress = [list objectAtIndex:indexPath.section-1];
+            }
+        }
+        comeSearch = 2;
+        pageNum = 1;
+        id location = [localAddress objectForKey:@"location"];
+        if ([[location class] isSubclassOfClass:[AMapGeoPoint class]]) {
+            AMapGeoPoint * location = [localAddress objectForKey:@"location"];
+            CLLocationCoordinate2D coordinate = CLLocationCoordinate2DMake(location.latitude,location.longitude);
+            _mapView.centerCoordinate = coordinate;
+        }else{
+            CLLocation * location = [localAddress objectForKey:@"location"];
+            CLLocationCoordinate2D coordinate = CLLocationCoordinate2DMake(location.coordinate.latitude,location.coordinate.longitude);
+            _mapView.centerCoordinate = coordinate;
+        }
+        [self.localTableView reloadData];
+        [self showLocalTableView];
+    }else {
+        if (indexPath.section == 0) {
+            selectedAddress = [list objectAtIndex:indexPath.section];
+        }else{
+            selectedAddress = [list objectAtIndex:indexPath.section];
+        }
+        
+        serchBar.text = [NSString stringWithFormat:@"%@(%@)",[selectedAddress objectForKey:@"address"],[selectedAddress objectForKey:@"area"]];
+        [[AddressReqModel sharedInstance] setAddress:[selectedAddress objectForKey:@"address"]];
+        [[AddressReqModel sharedInstance] setStreet:[selectedAddress objectForKey:@"area"]];
+        [[AddressReqModel sharedInstance] setCityCode:[selectedAddress objectForKey:@"cityCode"]];
+        id location = [selectedAddress objectForKey:@"location"];
+        if ([[location class] isSubclassOfClass:[AMapGeoPoint class]]) {
+            AMapGeoPoint * location = [selectedAddress objectForKey:@"location"];
+            [[AddressReqModel sharedInstance] setLat:[NSString stringWithFormat:@"%f",location.latitude]];
+            [[AddressReqModel sharedInstance] setLng:[NSString stringWithFormat:@"%f",location.longitude]];
+        }else{
+            CLLocation * location = [selectedAddress objectForKey:@"location"];
+            [[AddressReqModel sharedInstance] setLat:[NSString stringWithFormat:@"%f",location.coordinate.latitude]];
+            [[AddressReqModel sharedInstance] setLng:[NSString stringWithFormat:@"%f",location.coordinate.longitude]];
+        }
+        if (self.isSwitchCity == YES) {
+            [[CommClass sharedCommon] setObject:selectedAddress forKey:LocationAddress];
+            [self.delegate getAddress:[AddressReqModel sharedInstance].address];
+        }else{
+           [self.delegate getAddress:[AddressReqModel sharedInstance].address];
+        }
+        [tableView deselectRowAtIndexPath:indexPath animated:YES];
+        [serchBar resignFirstResponder];
+        [self.navigationController popViewControllerAnimated:YES];
+    }
+}
+
+
+#pragma mark -searchDisplayController delegate
+
+-(BOOL)searchBarShouldBeginEditing:(UISearchBar *)searchBar{
+    if ([self isNotNetwork]) {
+        [SRMessage infoMessage:@"网络异常，请检查您的网络。" delegate:self];
+        return NO;
+    }
+    [serchBar setShowsCancelButton:YES animated:YES] ;
+    
+    
+    _mapView.hidden = YES;
+    self.localTableView.hidden = YES;
+    self.searchTableView.hidden = NO;
+    self.localTableView.mj_footer = nil;
+    [super setUpFooterRefresh:self.searchTableView];
+    [self.searchTableView reloadData];
+    return YES;
+}
+
+- (BOOL)searchBarShouldEndEditing:(UISearchBar *)searchBar{
+    
+    return YES;
+}
+
+-(void)searchBarCancelButtonClicked:(UISearchBar *)searchBar
+{
+    searchBar.text = nil;
+    [self showLocalTableView];
+}
+
+
+-(void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText
+{
+    if (![DataCheck isValidString:searchBar.text]) {
+        [searchResult removeAllObjects];
+        [self.searchTableView reloadData];
+        return;
+    }
+    pageNum = 1;
+    [self keySearch:pageNum];
+}
+
+-(void)searchBarSearchButtonClicked:(UISearchBar *)searchBar{
+    [serchBar resignFirstResponder];
+    [serchBar setShowsCancelButton:NO animated:YES];
+}
+
+-(void)showLocalTableView
+{
+    [serchBar resignFirstResponder];
+    [serchBar setShowsCancelButton:NO animated:YES];
+    _mapView.hidden = NO;
+    self.localTableView.hidden = NO;
+    self.searchTableView.hidden = YES;
+    self.searchTableView.mj_footer = nil;
+    [super setUpFooterRefresh:self.localTableView];
+}
+
+#pragma mark - 回到当前位置
+- (IBAction)backUserLocation:(id)sender {
+    _mapView.centerCoordinate = _mapView.userLocation.coordinate;
+}
+-(void)keySearch:(NSInteger)page
+{
+    AMapPOIKeywordsSearchRequest *request = [[AMapPOIKeywordsSearchRequest alloc] init];
+    request.keywords            = [serchBar text];
+    request.city = city;
+    request.types = @"学校,写字楼,小区,街道";
+    request.requireExtension    = YES;
+    [_search AMapPOIKeywordsSearch:request];
+}
+@end

@@ -1,0 +1,92 @@
+//
+//  MyInfoModel.h
+//  KingProFrame
+//
+//  Created by lihualin on 15/8/10.
+//  Copyright (c) 2015年 king. All rights reserved.
+//
+
+#import "ResponseModel.h"
+
+@interface MyInfoModel : ResponseModel
+@property (nonatomic , retain) NSString * token; //用户token
+@property (nonatomic , retain) NSString * nickName; //用户昵称
+@property (nonatomic , retain) NSString * sex;   //性别
+@property (nonatomic , retain) NSString * imgUrl;   //用户头像地址
+
+@property (nonatomic , retain) NSString * userType;  //用户类型
+@property (nonatomic , retain) NSString * ifDelivery; // 是否送货员
+@property (nonatomic , retain) NSString * userCart;  //当前购物车商品数量
+@property (nonatomic , retain) NSString * cartPrice; //购物车总金额
+@property (nonatomic , retain) NSString * cartShipping; //还差多少免运费
+@property (nonatomic , retain) NSString * userWaitOrder; //购物车总金额
+@property (nonatomic , retain) NSString * balance; //当前余额
+@property (nonatomic , retain) NSString * epea; //当前e豆
+@property (nonatomic , retain) NSString * userCoupin; //当前优惠券数量
+@property (nonatomic , retain) NSString * ifAccept; //是否接单
+@property (nonatomic , retain) NSString * acceptDis; //接单距离（米）
+
+
+//我的信息
+@property (nonatomic , retain) NSString * userOrder; //我的订单数量
+@property (nonatomic , retain) NSString * userWaitAssessOrder; //待点评订单数
+@property (nonatomic , retain) NSString * userFinishOrder; //完成订单数
+//商家余额
+@property (nonatomic , retain) NSString * orderRevenue; //现货总收入
+@property (nonatomic , retain) NSString * commissionRevenue; //佣金总收入
+
+@property (nonatomic , retain) NSString * totalCounsumption;
+@property (nonatomic, retain)  NSString * totalBenefit;
+@property (nonatomic , retain) NSString * vipRetrench;
+
+
++ (MyInfoModel *)sharedInstance;
+-(void)setToken:(NSString *)aToken;
+-(void)setNickName:(NSString *)aNickName;
+-(void)setSex:(NSString *)aSex;
+-(void)setImgUrl:(NSString *)aImgUrl;
+-(void)setUserType:(NSString *)aUserType;
+-(void)setIfAccept:(NSString *)aIfAccept;
+-(void)setIfDelivery:(NSString *)aIfDelivery;
+-(void)setUserCart:(NSString *)aUserCart;
+-(void)setCartPrice:(NSString *)aCartPrice;
+-(void)setCartShipping:(NSString *)aCartShipping;
+-(void)setUserWaitOrder:(NSString *)aUserWaitOrder;
+-(void)setBalance:(NSString *)aBalance;
+-(void)setEpea:(NSString *)aEpea;
+-(void)setUserCoupin:(NSString *)aUserCoupin;
+-(void)setAcceptDis:(NSString *)aAcceptDis;
+-(void)setUserOrder:(NSString *)aUserOrder;
+-(void)setUserFinishOrder:(NSString *)uUserFinishOrder;
+-(void)setUserWaitAssessOrder:(NSString *)uUserWaitAssessOrder;
+-(void)setOrderRevenue:(NSString *)oOrderRevenue;
+-(void)setCommissionRevenue:(NSString *)cCommissionRevenue;
+-(void)setTotalCounsumption:(NSString *)atotalCounsumption;
+-(void)setVipRetrench:(NSString *)avipRetrench;
+
+-(NSString *)getToken;
+-(NSString *)getNickName;
+-(NSString *)getSex;
+-(NSString *)getImgUrl;
+-(NSString *)getUserType;
+-(NSString *)getIfAccept;
+-(NSString *)getIfDelivery;
+-(NSString *)getUserCart;
+-(NSString *)getCartPrice;
+-(NSString *)getCartShipping;
+-(NSString *)getUserWaitOrder;
+-(NSString *)getBalance;
+-(NSString *)getEpea;
+-(NSString *)getUserCoupin;
+-(NSString *)getAcceptDis;
+-(NSString *)getUserOrder;
+-(NSString *)getUserWaitAssessOrder;
+-(NSString *)getUserFinishOrder;
+-(NSString *)getOrderRevenue;
+-(NSString *)getCommissionRevenue;
+-(NSString *)getTotalConsumption;
+-(NSString *)getVipRetrench;
+
++(void)create:(NSDictionary *)inDic;
++(void)setClassEmue:(NSDictionary *)inDic;
+@end

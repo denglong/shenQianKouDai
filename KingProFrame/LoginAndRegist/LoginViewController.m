@@ -1,0 +1,473 @@
+//
+//  LoginViewController.m
+//  KingProFrame
+//
+//  Created by lihualin on 15/7/28.
+//  Copyright (c) 2015年 king. All rights reserved.
+//
+
+#import "LoginViewController.h"
+#import "RegisterViewController.h"
+#import "RegisterPageController.h"
+#import "CodeLoginViewController.h"
+#import "SelectedAttendantViewController.h"
+#import "TabBarController.h"
+#import "HomeViewController.h"
+#import "HomeApiModel.h"
+
+@interface LoginViewController ()<UITextFieldDelegate>
+{
+    NSString * passWord;
+    NSTimer  * pushTimer;
+}
+@property (weak, nonatomic) IBOutlet UITextField *phonetext;
+@property (weak, nonatomic) IBOutlet UIButton *loginBtn;
+@property (weak, nonatomic) IBOutlet UITextField *passwordtext;
+- (IBAction)btnClick:(UIButton *)sender;
+@property (weak, nonatomic) IBOutlet UIView *loginLine;
+@property (nonatomic ,retain) CloudClient * cloudClient;
+
+@end
+
+@implementation LoginViewController
+
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    
+    self.title = @"登录";
+    self.view.backgroundColor = [UIColor whiteColor];
+    
+    self.loginLine.frame = CGRectMake(self.loginLine.frame.origin.x, 44.5, self.loginLine.frame.size.width, 0.5);
+    self.loginBtn.layer.cornerRadius = 3;
+    _cloudClient = [CloudClient getInstance];
+//    [self.phonetext becomeFirstResponder];
+}
+
+- (IBAction)cancelLoginAction:(id)sender {
+    [self LoginleftCancelAction];
+}
+
+//返回按钮点击事件
+-(void)LoginleftCancelAction{
+    
+    [self.phonetext resignFirstResponder];
+    
+    [UserLoginModel updateCancelIdentify:CANCELLOGIN_CONCANCEL];
+    [[NSUserDefaults standardUserDefaults] setObject:@"1" forKey:@"AUTODISMISS"];
+    
+    [[CommClass sharedCommon]setObject:@"" forKey:CART_GOODSID];
+    
+    NSNotification *notification = [NSNotification notificationWithName:NOTIFICATION_LOGINCANCEL
+                                                                 object:nil
+                                                               userInfo:nil];
+    [[NSNotificationCenter defaultCenter] postNotification:notification];
+    
+//    BOOL isLogin = [[NSUserDefaults standardUserDefaults] boolForKey:CODE_ISLOGIN];
+//    if (isLogin == YES) {
+//        UINavigationController *navigation = (UINavigationController*)[UIApplication sharedApplication].keyWindow.rootViewController;
+//        [navigation popToRootViewControllerAnimated:NO];
+//    }
+    
+    TabBarController *tabbar = [TabBarController sharedInstance];
+    tabbar.selectedIndex = 0;
+    
+     [self dismissViewControllerAnimated:YES completion:^{
+        [UserLoginModel updateCancelIdentify:CANCELLOGIN_DEFAULT];
+         [[NSUserDefaults standardUserDefaults] setObject:@"0" forKey:@"AUTODISMISS"];
+    }];
+}
+
+/*
+ 按钮事件
+ */
+
+- (IBAction)btnClick:(UIButton *)sender {
+    self.hidesBottomBarWhenPushed = YES;
+    switch (sender.tag) {
+        case 10:
+        {
+            //明文
+            if (self.passwordtext.secureTextEntry == YES) {
+                [self.passwordtext setSecureTextEntry:NO];
+                sender.selected = YES;
+            }else{
+                [self.passwordtext setSecureTextEntry:YES];
+                sender.selected = NO;
+            }
+        }
+            break;
+        case 11:
+        {
+            //登录
+            [MobClick event:Cfm_Login];
+            if (![super checkTel:self.phonetext.text]) {
+                [super hidenHUD];
+                return;
+            }
+            if ([DataCheck isValidString:self.passwordtext.text]) {
+                if (self.passwordtext.text.length < 6) {
+                    [SRMessage infoMessage:@"密码长度应为6-18位字符，请重新输入" delegate:self];
+                    return;
+                }
+                [self login:nil];
+                // [self getSalt];
+                
+            }else{
+            
+                [SRMessage infoMessage:@"请输入密码" delegate:self];
+                return;
+            }
+        }
+            break;
+        case 12://忘记密码
+        {
+            RegisterPageController *forgetPage = [[RegisterPageController alloc] init];
+            forgetPage.titleName = @"忘记密码";;
+            [self.navigationController pushViewController:forgetPage animated:YES];
+        }
+            break;
+            
+        default://注册
+        {
+            RegisterPageController *registerPage = [[RegisterPageController alloc] init];
+            registerPage.titleName = @"手机快速注册";;
+            [self.navigationController pushViewController:registerPage animated:YES];
+        }
+            break;
+    }
+}
+
+
+/*
+ 获取密钥
+ */
+-(void)getSalt
+{
+    [_cloudClient requestMethodWithMod:@"member/getSalt"
+                                params:nil
+                            postParams:nil
+                              delegate:self
+                              selector:@selector(getSaltSuccessed:)
+                         errorSelector:@selector(getSaltError:)
+                      progressSelector:nil];
+    
+}
+
+-(void)getSaltSuccessed:(NSDictionary *)response
+{
+    if ([DataCheck isValidDictionary:response]) {
+        
+        [self login:[response objectForKey:@"salt"]];
+    }
+    
+}
+-(void)getSaltError:(NSDictionary *)response
+{
+    
+}
+
+#pragma mark - 登录
+-(void)login:(NSString *)salt
+{
+    if ([self isNotNetwork]) {
+        [SRMessage infoMessage:@"网络异常，请检查您的网络。" delegate:self];
+        return;
+    }
+    [super showHUD];
+    NSString * mdPassWord = [super md5:self.passwordtext.text];
+    NSString * pswStr = [super md5:mdPassWord];
+    
+    [[CommClass sharedCommon] setObject:[GeTuiSdk clientId] forKey:@"CID"];
+    
+    NSString *cid = [GeTuiSdk clientId]?[GeTuiSdk clientId]:@"";
+    
+//    NSDictionary * postParams = @{@"type":@"1",
+//                                  @"username":self.phonetext.text,
+//                                  @"password":pswStr,
+//                                  @"salt":@"",
+//                                  @"cid":cid};
+    NSDictionary *postParams = @{@"username":self.phonetext.text,
+                                 @"password":self.passwordtext.text,
+                                 @"type":@"1"};
+    
+    [_cloudClient requestMethodWithMod:@"member/login"
+                                params:nil
+                            postParams:postParams
+                              delegate:self
+                              selector:@selector(loginSuccessed:)
+                         errorSelector:@selector(loginError:)
+                      progressSelector:nil];
+}
+
+/*
+ 登陆成功
+ */
+-(void)loginSuccessed:(NSDictionary *)response
+{
+    [MobClick event:Login_Succes];
+    if ([DataCheck isValidArray:[response objectForKey:@"userInfoList"]]) {
+        
+        NSArray * userInfoList = [response objectForKey:@"userInfoList"];
+        //用户信息 格式化收到的用户信息格式
+        NSDictionary *userInfoDic  =[self formatSpecialArray:userInfoList];
+        //用户token非空验证
+        if ([DataCheck isValidString:[userInfoDic objectForKey:@"token"]]) {
+            NSString *token=[userInfoDic objectForKey:@"token"];
+            [UserLoginModel setLoginWithToken:token userName:self.phonetext.text userInfo:userInfoDic];
+        }
+        
+        NSString *acceptDis = [userInfoDic objectForKey:@"acceptDis"];
+        [[NSUserDefaults standardUserDefaults] setObject:acceptDis forKey:@"ACCEPTDIS"];
+    }
+    
+    /**----------------------个推绑定账号-------------------------------------*/
+    NSString *cid = [[CommClass sharedCommon] objectForKey:@"CID"];
+    if (![DataCheck isValidString:cid]) {
+        pushTimer = [NSTimer scheduledTimerWithTimeInterval:300 target:self selector:@selector(pushRegisterAction) userInfo:nil repeats:YES];
+    }
+    else
+    {
+        [pushTimer invalidate];
+    }
+    
+    [GeTuiSdk setPushModeForOff:NO];
+    /**----------------------个推绑定账号-------------------------------------*/
+    [super hidenHUD];
+    
+    [self.passwordtext resignFirstResponder];
+    [self.phonetext resignFirstResponder];
+    
+    [[HomeApiModel sharedInstance] getCartTotalData];
+    
+    //登录成功退出当前登录页面
+    [self dismissViewControllerAnimated:YES completion:^{
+        [[UIApplication sharedApplication] setStatusBarHidden:NO];
+    }];
+}
+
+//个推注册
+- (void)pushRegisterAction {
+    NSString *phoneNum = [[CommClass sharedCommon] objectForKey:LOGGED_USERNAME];
+    if ([DataCheck isValidString:phoneNum]) {
+        [self registerRemoteNotification];
+        [GeTuiSdk setPushModeForOff:NO];
+        [GeTuiSdk bindAlias:phoneNum];
+    }
+    else
+    {
+        [pushTimer invalidate];
+    }
+}
+
+-(void)loginError:(NSDictionary *)response
+{
+    [super hidenHUD];
+    
+}
+
+/**
+ 注册事件
+ */
+-(void)registerAction:(id)sender
+{
+    [MobClick event:Clik_Reg];
+    RegisterViewController * registerViewController = [[RegisterViewController alloc]init];
+    registerViewController.viewTag = -100;
+    self.hidesBottomBarWhenPushed = YES;
+    [self.navigationController pushViewController:registerViewController animated:YES];
+}
+
+
+
+#pragma mark - textfeild delegate
+
+-(BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
+{
+    NSString * toBeString =[textField.text stringByReplacingCharactersInRange:range withString:string];
+    
+    if (textField == self.phonetext) {
+        if (toBeString.length > 11) {
+            return NO;
+        }else{
+            return YES;
+        }
+    }
+    if (textField == self.passwordtext) {
+       
+        //数字
+        NSString * tempStr =@"0123456789";
+        NSRange rangeshuzi = [tempStr rangeOfString:string];//判断字符串是否包含连续的数字
+        
+        //小写  正序
+        NSString * lowerStr = @"abcdefghijklmnopqrstuvwxyz";
+        NSRange rangeLower = [lowerStr rangeOfString:string];//判断字符串是否包含连续的小写字母
+        //大写  正序
+        NSString * capitalStr =[lowerStr uppercaseString];
+        NSRange rangeCap = [capitalStr rangeOfString:string];//判断字符串是否包含连续的大写字母
+        passWord = toBeString;
+        if ([string isEqualToString:@""]) {
+            return YES;
+        }
+        if(rangeshuzi.length == 0 && rangeLower.length == 0 && rangeCap.length == 0)
+        {
+            return NO;
+        }
+        
+        if ([string isEqualToString:@" "]) {
+            return NO;
+        }
+        
+        if (toBeString.length > 18) {
+            return NO;
+        }else{
+            
+            return YES;
+        }
+        
+    }
+    return YES;
+}
+//对键盘选择文字的监听
+
+-(BOOL)textFieldShouldBeginEditing:(UITextField *)textField
+{
+    if (textField == self.passwordtext) {
+         [textField addTarget:self
+                       action:@selector(passWordFiledEditChanged:)
+             forControlEvents:UIControlEventEditingChanged];
+    }
+    return YES;
+}
+
+-(void)passWordFiledEditChanged:(UITextField *)textField
+{
+     self.passwordtext.text = passWord;
+}
+-(BOOL)textFieldShouldClear:(UITextField *)textField
+{
+    passWord = @"";
+    return YES;
+}
+
+-(BOOL)textFieldShouldReturn:(UITextField *)textField
+{
+    [self.phonetext resignFirstResponder];
+    [self.passwordtext resignFirstResponder];
+    return YES;
+}
+
+-(void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    [self.navigationController setNavigationBarHidden:YES animated:YES];
+    [MobClick beginLogPageView:NSStringFromClass([self class])];
+    [[UIApplication sharedApplication] setStatusBarHidden:NO];
+}
+
+-(void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+    [MobClick endLogPageView:NSStringFromClass([self class])];
+    
+    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:CODE_ISLOGIN];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+#pragma mark - 收起键盘
+- (IBAction)hiddenKeyBoardAction:(id)sender {
+    
+    [self.phonetext resignFirstResponder];
+    [self.passwordtext resignFirstResponder];
+}
+
+#pragma mark - 第三方登录处理
+- (IBAction)thireLoginAction:(UIButton *)sender {
+    
+    SSDKPlatformType thireLoginType;
+    switch (sender.tag) {
+        case 0:
+            thireLoginType = SSDKPlatformTypeWechat;
+            break;
+            
+        case 1:
+            thireLoginType = SSDKPlatformTypeQQ;
+            break;
+            
+        case 2:
+            thireLoginType = SSDKPlatformTypeSinaWeibo;
+            break;
+        default:
+            break;
+    }
+    
+    [ShareSDK getUserInfo:thireLoginType onStateChanged:^(SSDKResponseState state, SSDKUser *user, NSError *error) {
+        
+        if (state == SSDKResponseStateSuccess)
+        {
+            [self registerThireLoginAction:user];
+        }
+        
+        else
+        {
+            NSLog(@"%@",error);
+        }
+    }];
+}
+
+- (void)registerThireLoginAction:(SSDKUser *)user {
+    
+    [super showHUD];
+    NSString *platformType = nil;
+    if (user.platformType == SSDKPlatformSubTypeQZone) {
+        platformType = @"1";//qq登录
+    }
+    else
+    {
+        platformType = @"2";//微信登录
+    }
+    
+    NSString *gender;
+    switch (user.gender) {
+        case SSDKGenderMale:
+            gender = @"0";
+            break;
+        case SSDKGenderFemale:
+            gender = @"1";
+            break;
+        case SSDKGenderUnknown:
+            gender = @"2";
+            break;
+        default:
+            break;
+    }
+    
+    NSDictionary *params = @{@"platformType": platformType,
+                             @"credential": user.uid,
+                             @"nickname": user.nickname?user.nickname:@"",
+                             @"icon": user.icon?user.icon:@"",
+                             @"gender": gender,
+                             @"aboutMe": user.aboutMe?user.aboutMe:@"",
+                             @"birthday": user.birthday?user.birthday:@""};
+    
+    [_cloudClient requestMethodWithMod:@"member/login"
+                                params:nil
+                            postParams:params
+                              delegate:self
+                              selector:@selector(registerThireLoginSuccessed:)
+                         errorSelector:@selector(registerThireLoginError:)
+                      progressSelector:nil];
+}
+
+- (void)registerThireLoginSuccessed:(NSDictionary *)response {
+    
+    [self loginSuccessed:response];
+}
+
+- (void)registerThireLoginError:(NSDictionary *)response {
+    
+    [super hidenHUD];
+}
+
+
+@end

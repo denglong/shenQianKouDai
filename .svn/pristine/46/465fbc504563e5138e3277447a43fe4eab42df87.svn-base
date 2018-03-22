@@ -1,0 +1,557 @@
+//
+//  CommodityDetailsViewController.m
+//  KingProFrame
+//
+//  Created by lihualin on 15/8/19.
+//  Copyright (c) 2015年 king. All rights reserved.
+//
+
+#import "CommodityDetailsViewController.h"
+#import "CommodityDetailHeaderCell.h"
+#import "CommodityCollectionViewCell.h"
+#import "CommodityHeaderCell.h"
+#import "CommodityHeaderCollectionReusableView.h"
+#import "ShopCartController.h"
+#import "NavigationController.h"
+#import "Commodity.h"
+#import "goodsModel.h"
+#import "UIViewController+KNSemiModal.h"
+#import "CYShopCartingViewController.h"
+#import "WLZ_ShoppingCarController.h"
+#import "TabBarController.h"
+
+@interface CommodityDetailsViewController ()<UICollectionViewDataSource,UICollectionViewDelegate,UICollectionViewDelegateFlowLayout,ShopCartControllerDelegate,reloadDelegate,UIGestureRecognizerDelegate,CYShopCartingViewControllerDelegate>
+{
+    CloudClient * _cloudClient;
+    /** 组合详情信息*/
+    NSArray * list;
+    float priceCount;
+    NSInteger num;
+    UIView * noNetWork;
+    NSArray * cartGoodsList;
+    goodsModel *model;
+}
+/**商品详情model*/
+@property (nonatomic , retain) Commodity * commodityDic;
+
+@property (weak, nonatomic) IBOutlet UICollectionView *commodityCollectionView;
+
+@property (weak, nonatomic) IBOutlet UIButton *selectedOkBtn;
+@property (weak, nonatomic) IBOutlet UIView *selectedOkView;
+@property (weak, nonatomic) IBOutlet UIImageView *shopCartImage;
+
+@property (weak, nonatomic) IBOutlet UILabel *myShopNum;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *redWidthConstraint;
+
+@property (nonatomic,strong) NSDictionary *orderInfoDictionary;
+
+- (IBAction)selectedOkBtnAction:(UIButton *)sender;
+
+@end
+
+@implementation CommodityDetailsViewController
+
+//无网判断添加页面
+- (BOOL)noNetwork {
+    if ([self isNotNetwork]) {
+        self.commodityCollectionView.hidden = YES;
+        self.selectedOkView.hidden = YES;
+        noNetWork = [NoNetworkView sharedInstance].view;
+        noNetWork.hidden = NO;
+        noNetWork.frame = CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
+        [NoNetworkView sharedInstance].reloadDelegate =self;
+        [self.view addSubview:noNetWork];
+        [super hidenHUD];
+        return YES;
+    }
+    else
+    {
+        self.selectedOkView.hidden = NO;
+        self.commodityCollectionView.hidden = NO;
+        [noNetWork removeFromSuperview];
+        return NO;
+    }
+}
+
+-(void)reloadAgainAction
+{
+    [super showHUD];
+    [self getLikesGoods];
+    //添加购物车
+    ShoppingCartModel * cartModel = [ShoppingCartModel shareModel];
+    [cartModel getCartInfo];
+    //待定 ？？？
+    [self updateShoppingCart];
+}
+
+#pragma mark - getGoods
+-(void)getLikesGoods
+{
+    if ([self noNetwork]) {
+        return;
+    }
+    NSDictionary * postParams = @{@"goodsId":self.goodsId};
+    
+    [_cloudClient requestMethodWithMod:@"goods/getGoodsDetail"
+                                params:nil
+                            postParams:postParams
+                              delegate:self
+                              selector:@selector(getLikesGoodsSuccessed:)
+                         errorSelector:@selector(getLikesGoodsError:)
+                      progressSelector:nil];
+}
+
+
+-(void)getLikesGoodsSuccessed:(NSDictionary *)response
+{
+    [super hidenHUD];
+    self.commodityDic = [Commodity mj_objectWithKeyValues:response];
+    self.title = self.commodityDic.goodsName;
+    if (self.commodityDic.goodsName.length > 10) {
+        self.title = [self.commodityDic.goodsName stringByReplacingCharactersInRange:NSMakeRange(10, self.commodityDic.goodsName.length-10) withString:@"..."];
+    }
+    
+    if ([DataCheck isValidString:self.commodityDic.groupDetail]) {
+        list = [self.commodityDic.groupDetail componentsSeparatedByString:@","];
+    }
+    
+    [self.commodityCollectionView reloadData];
+}
+
+-(void)getLikesGoodsError:(NSDictionary *)response
+{
+    
+    [super hidenHUD];
+}
+
+
+-(void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    self.navigationController.navigationBarHidden = YES;
+    [MobClick beginLogPageView:NSStringFromClass([self class])];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(updateShoppingCart)
+                                                 name:NOTIFICATION_UPDATESHOPPINGCARTINFO
+                                               object:nil];
+    
+    [self getLikesGoods];
+    //获取购物车数据
+    ShoppingCartModel * cartModel = [ShoppingCartModel shareModel];
+    [cartModel getCartInfo];
+    //待定 ？？？
+    [self updateShoppingCart];
+    if ([DataCheck isValidString:[[CommClass sharedCommon]objectForKey:CART_GOODSID]]) {
+        [self addCommodityAction:nil];
+    }
+}
+
+-(void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+    [MobClick endLogPageView:NSStringFromClass([self class])];
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    [self createBackButton];
+    
+    self.myShopNum.layer.cornerRadius = self.myShopNum.frame.size.height/2;
+    UINib *nibheader=[UINib nibWithNibName:@"CommodityDetailHeaderCell" bundle:nil];
+    //cell的注册
+    [self.commodityCollectionView registerNib:nibheader forCellWithReuseIdentifier:@"CommodityDetailHeaderCell"];
+    UINib *nib=[UINib nibWithNibName:@"CommodityCollectionViewCell" bundle:nil];
+    //cell的注册
+    [self.commodityCollectionView registerNib:nib forCellWithReuseIdentifier:@"CELL"];
+    
+    UINib *nib1=[UINib nibWithNibName:@"CommodityHeaderCell" bundle:nil];
+    //cell的注册
+    [self.commodityCollectionView registerNib:nib1 forCellWithReuseIdentifier:@"CommodityHeaderCell"];
+    
+    UINib *headernib=[UINib nibWithNibName:@"CommodityHeaderCollectionReusableView" bundle:nil];
+    //cell的注册
+    [self.commodityCollectionView registerNib:headernib forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"HEADERCELL"];
+  
+    UITapGestureRecognizer * tipger =[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(goCart:)];
+    [self.shopCartImage addGestureRecognizer:tipger];
+    
+    _cloudClient = [CloudClient getInstance];
+    [super showHUD];
+    
+}
+
+- (void)createBackButton {
+    
+    UIButton *backBtn = [[UIButton alloc] init];
+    [backBtn setImage:UIIMAGE(@"back") forState:UIControlStateNormal];
+    [self.view addSubview:backBtn];
+    [backBtn addTarget:self action:@selector(clickBackAction) forControlEvents:UIControlEventTouchUpInside];
+    
+    [backBtn mas_makeConstraints:^(MASConstraintMaker *make) {
+       
+        make.top.equalTo(self.view).with.offset(26);
+        make.left.equalTo(self.view).with.offset(20);
+        make.width.equalTo(@20);
+        make.height.equalTo(@36);
+    }];
+}
+
+- (void)clickBackAction {
+    
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+#pragma mark - delegate
+//设置Section个数
+-(NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
+{
+    if ([DataCheck isValidArray:list] && [DataCheck isValidArray:self.commodityDic.goodsList]) {
+        return 3;
+    }
+    if (![DataCheck isValidArray:list] && ![DataCheck isValidArray:self.commodityDic.goodsList]) {
+        return 1;
+    }
+    return 2;
+}
+//设置item个数
+-(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
+{
+    if (section == 0) {
+        return 1;
+    }
+    if ([DataCheck isValidArray:list] && section == 1) {
+        return list.count;
+    }
+    return  self.commodityDic.goodsList.count;
+}
+
+//设置item上下间距
+- (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout minimumLineSpacingForSectionAtIndex:(NSInteger)section
+{
+//    if (([DataCheck isValidArray:list] && section == 2) ||(![DataCheck isValidArray:list] && section == 1)) {
+//        return 10;
+//    }
+    return 1;
+}
+////设置item左右间距
+- (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout minimumInteritemSpacingForSectionAtIndex:(NSInteger)section
+{
+//    if (([DataCheck isValidArray:list] && section == 2) ||(![DataCheck isValidArray:list] && section == 1)) {
+//         return 10;
+//    }
+    return 0;
+}
+
+
+//设置元素大小
+-(CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath{
+    //DLog(@"%f",(kDeviceHeight-88-49)/4.0);
+    if (indexPath.section == 0) {
+        NSString * name =self.commodityDic.goodsName;
+        CGSize size = [CommClass getSuitSizeWithString:name font:12.0 bold:NO sizeOfX:viewWidth - 20];
+        if ([DataCheck isValidString:self.commodityDic.giftInfo]) {
+            if ([DataCheck isValidArray:self.commodityDic.goodsTags]) {
+                return CGSizeMake(viewWidth, 242+size.height+80);
+            }
+            return CGSizeMake(viewWidth, 242+size.height+57);
+        }else{
+            if ([DataCheck isValidArray:self.commodityDic.goodsTags]) {
+                return CGSizeMake(viewWidth, 242+size.height+50);
+            }
+            return CGSizeMake(viewWidth, 242+size.height+37);
+        }
+       
+    }
+    if ([DataCheck isValidArray:list] && indexPath.section == 1) {
+        NSString * title = [list objectAtIndex:indexPath.item];
+         CGSize size = [CommClass getSuitSizeWithString:title font:12.0 bold:NO sizeOfX:viewWidth - 20];
+        return CGSizeMake(viewWidth,26+size.height);
+    }
+     return CGSizeMake((viewWidth)/3,165);
+}
+
+-(UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (indexPath.section == 0) {
+        static NSString *collectionCellID = @"CommodityDetailHeaderCell";
+        CommodityDetailHeaderCell * cell = (CommodityDetailHeaderCell *)[collectionView dequeueReusableCellWithReuseIdentifier:collectionCellID forIndexPath:indexPath];
+//        [cell.addCommodityBtn addTarget:self action:@selector(addCommodityAction:) forControlEvents:UIControlEventTouchUpInside];
+        [cell setCommodity:self.commodityDic];
+        return cell;
+
+    }
+    
+    if ([DataCheck isValidArray:list] && indexPath.section == 1) {
+        static NSString *collectionCellID = @"CommodityHeaderCell";
+        CommodityHeaderCell * cell = (CommodityHeaderCell *)[collectionView dequeueReusableCellWithReuseIdentifier:collectionCellID forIndexPath:indexPath];
+        cell.nameLabel.text = [list objectAtIndex:indexPath.item];
+        cell.centerX = viewWidth/2;
+        return cell;
+    }
+    
+        static NSString *collectionCellID = @"CELL";
+        CommodityCollectionViewCell * cell = (CommodityCollectionViewCell *)[collectionView dequeueReusableCellWithReuseIdentifier:collectionCellID forIndexPath:indexPath];
+//        cell.addCommodityBtn.tag = 10+indexPath.item;
+//        [cell.addCommodityBtn addTarget:self action:@selector(addCommodityAction:) forControlEvents:UIControlEventTouchUpInside];
+    [cell.addShopCartBtn addTarget:self action:@selector(addShopCartAction:) forControlEvents:UIControlEventTouchUpInside];
+    cell.addShopCartBtn.tag = indexPath.row;
+        [cell setGoods:[self.commodityDic.goodsList objectAtIndex:indexPath.item]];
+        return cell;
+    
+}
+
+//设置头部
+-(CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout referenceSizeForHeaderInSection:(NSInteger)section
+{
+    if (section == 0) {
+         return CGSizeZero;
+    }
+    
+   return CGSizeMake(viewWidth, 35);
+}
+
+//设置头部和尾部的view
+-(UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath
+{
+    if (kind == UICollectionElementKindSectionHeader) {
+        static NSString * headerID = @"HEADERCELL";
+        CommodityHeaderCollectionReusableView * headerView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:headerID forIndexPath:indexPath];
+        if ([DataCheck isValidArray:list] && indexPath.section == 1) {
+            headerView.titlelabel.text = @"|  组合详情";
+        }else{
+            headerView.titlelabel.text = @"|  猜你还喜欢";
+        }
+        return headerView;
+    }
+    return nil;
+    
+}
+//点击事件
+-(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (([DataCheck isValidArray:list] && indexPath.section == 2) ||(![DataCheck isValidArray:list] && indexPath.section == 1)) {
+        if (indexPath.item == 0) {
+            [MobClick endEvent:Commodity_Detail_C1];
+        }
+        if (indexPath.item == 1) {
+            [MobClick endEvent:Commodity_Detail_C2];
+        }
+        CommodityDetailsViewController * commodityDetail = [[CommodityDetailsViewController alloc]init];
+        //            commodityDetail.cid = self.typeId;
+        goodsModel * goodsModel = [self.commodityDic.goodsList objectAtIndex:indexPath.item];
+        commodityDetail.goodsId = goodsModel.goodsId;
+        commodityDetail.cartShop = self.cartShop;
+        self.hidesBottomBarWhenPushed = YES;
+        [self.navigationController pushViewController:commodityDetail animated:YES];
+//        self.hidesBottomBarWhenPushed = NO;
+    }
+}
+
+#pragma mark - 加入购物车
+- (void)addShopCartAction:(UIButton *)sender {
+    
+    NSLog(@"加入购物车");
+    model = self.commodityDic.goodsList[sender.tag];
+    ShoppingCartModel *cartModel=[ShoppingCartModel shareModel];
+    [cartModel addWithGoodsId:model.goodsId];
+}
+
+#pragma mark - 加入购物车接口
+- (void)addCartGoodAction:(NSString *)goodsId {
+    
+    NSDictionary *params = @{@"goodsId":goodsId, @"number":@"1"};
+    [_cloudClient requestMethodWithMod:@"cart/addCart"
+                          params:nil
+                      postParams:params
+                        delegate:self
+                        selector:@selector(addCartGoodFinish:)
+                   errorSelector:@selector(addCartGoodFiled:)
+                progressSelector:nil];
+}
+
+- (void)addCartGoodFinish:(NSDictionary *)response {
+    if ([DataCheck isValidDictionary:response]) {
+        
+        NSString *number = response[@"cartInfo"][@"cartNumber"];
+        [[TabBarController sharedInstance] setShopCartNumberAction:number];
+    }
+}
+
+- (void)addCartGoodFiled:(NSDictionary *)response {
+    [SRMessage infoMessage:@"加入购物车失败！"];
+}
+
+//sender.tag = 7表示最上面的商品，即为上个页面传过来的商品
+-(void)addCommodityAction:(UIButton *)sender
+{
+
+    [MobClick event:Add_inDetailPage];
+
+    if ([self isNotNetwork]) {
+        [SRMessage infoMessage:@"网络异常，请检查您的网络。" delegate:self];
+        return;
+    }
+
+    NSString * goodsId = self.commodityDic.goodsId;
+    if (![UserLoginModel isLogged]) {
+
+        [[CommClass sharedCommon]setObject:[NSString stringWithFormat:@"%@",goodsId] forKey:CART_GOODSID];
+        [[AppModel sharedModel]  presentLoginController:[UIApplication sharedApplication].keyWindow.rootViewController];
+        return;
+    }
+
+    
+    if ([DataCheck isValidString:[[CommClass sharedCommon]objectForKey:CART_GOODSID]]) {
+        
+        goodsId=[[CommClass sharedCommon]objectForKey:CART_GOODSID];
+    }
+    else{
+        
+        goodsId = self.commodityDic.goodsId;
+
+    }
+    
+    //添加购物车
+    ShoppingCartModel *cartModel=[ShoppingCartModel shareModel];
+    [cartModel addWithGoodsId:goodsId];
+//    [cartModel editWithGoodsId:goodsId andNumber:[NSString stringWithFormat:@"%zd",num+1]];
+    //待定 ？？？
+    [self updateShoppingCart];
+}
+
+// 更新购物车信息 0
+
+-(void)updateShoppingCart{
+    [self hidenHUD];
+    ShoppingCartModel *cartModel=[ShoppingCartModel shareModel];
+    if ([[cartModel goodsNum] intValue] > 0) {
+
+        self.myShopNum.hidden = NO;
+    }else{
+
+        self.myShopNum.hidden = YES;
+    }
+    
+    if ([[cartModel goodsNum] intValue] >= 10) {
+        self.redWidthConstraint.constant = 23;
+    }
+    else if ([[cartModel goodsNum] intValue] >= 100) {
+        self.redWidthConstraint.constant = 30;
+    }
+    else if ([[cartModel goodsNum] intValue] >= 1000) {
+        self.redWidthConstraint.constant = 40;
+    }
+    else
+    {
+        self.redWidthConstraint.constant = 18;
+    }
+
+//    if ([[cartModel goodsNum] intValue] > 99) {
+//        self.myShopNum.text = @"···";
+//    }else{
+        self.myShopNum.text = [NSString stringWithFormat:@"%@",[cartModel goodsNum]];
+//    }
+
+    
+    for (NSDictionary * dic in cartModel.shopInfos) {
+        NSString * goodsId = [NSString stringWithFormat:@"%@",[dic objectForKey:@"goodsId"]];
+        if ([goodsId isEqualToString:self.goodsId]) {
+            num = [[dic objectForKey:@"goodsNumber"] integerValue];
+            return;
+        }
+    }
+}
+
+
+- (IBAction)selectedOkBtnAction:(UIButton *)sender {
+    [self showView:sender.center];
+
+}
+#pragma mark - 加入购物车动画
+
+- (void)showView:(CGPoint)point
+{
+    self.commodityCollectionView.userInteractionEnabled = NO;
+    UIImageView *animationView = [[UIImageView alloc] initWithFrame:CGRectMake(point.x, point.y+30, 25, 25)];
+    
+    //    animationView = [[UIImageView alloc] initWithFrame:CGRectMake(viewWidth, point.y - 30, 30, 30)];
+    
+    animationView.image = [UIImage imageNamed:@"icon"];
+    animationView.layer.masksToBounds = YES;
+    animationView.layer.cornerRadius = animationView.frame.size.height/2;
+    [self.selectedOkView addSubview:animationView];
+    CAKeyframeAnimation *keyframeAnimation=[CAKeyframeAnimation animationWithKeyPath:@"position"];
+    CGMutablePathRef path = CGPathCreateMutable();
+    CGPathMoveToPoint(path, NULL, animationView.center.x, animationView.center.y-30);//移动到起始点
+    CGPathAddQuadCurveToPoint(path, NULL, viewWidth/2, -100, self.shopCartImage.center.x, self.shopCartImage.center.y);
+    keyframeAnimation.path = path;
+    keyframeAnimation.delegate = self;
+    CGPathRelease(path);
+    keyframeAnimation.duration = 0.5;
+    [animationView.layer addAnimation:keyframeAnimation forKey:@"KCKeyframeAnimation_Position"];
+    [self performSelector:@selector(hidenView:) withObject:animationView afterDelay:0.45f];
+}
+
+- (void)hidenView:(UIView *)myView {
+    [myView removeFromSuperview];
+    self.commodityCollectionView.userInteractionEnabled = YES;
+    [self addCommodityAction:nil];
+}
+
+-(void)getGoods:(NSString *)goodsId
+{
+//    self.commodityDic = [NSDictionary dictionaryWithDictionary:goods];
+    self.goodsId = goodsId;
+    [self getLikesGoods];
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+
+
+#pragma mark - 点击购物车事件
+-(void)goCart:(UITapGestureRecognizer *)sender
+{
+    if (![UserLoginModel isLogged]) {
+        [[AppModel sharedModel] presentLoginController:self];
+        return;
+    }
+    ShopCartController *shopCart = [[ShopCartController alloc] init];
+    self.hidesBottomBarWhenPushed = YES;
+    shopCart.isOtherPush = YES;
+    [self.navigationController pushViewController:shopCart animated:YES];
+}
+
+
+
+#pragma mark - CYShopCartingViewControllerDelegate
+// just for fun
+- (void)gotoBuy
+{
+    [self.navigationController setNavigationBarHidden:NO];
+    
+    for (UIViewController *controller in self.navigationController.viewControllers) {
+        if ([controller isKindOfClass:[CYShopCartingViewController class]]) {
+            [controller removeFromParentViewController];
+        }
+    }
+    
+    ConfirmOrderController *confirmControll=[[ConfirmOrderController alloc]
+                                             initWithNibName:@"ConfirmOrderController"
+                                             bundle:nil];
+    confirmControll.orderInfoDic=[[NSDictionary alloc]initWithDictionary:self.orderInfoDictionary];
+    
+    [self.navigationController setNavigationBarHidden:YES];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self.navigationController pushViewController:confirmControll animated:YES];
+    });
+    [self.navigationController setNavigationBarHidden:NO];
+}
+
+
+
+
+@end

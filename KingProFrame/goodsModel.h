@@ -1,0 +1,24 @@
+//
+//  goodsModel.h
+//  KingProFrame
+//
+//  Created by lihualin on 15/8/10.
+//  Copyright (c) 2015年 king. All rights reserved.
+//
+
+//#import "BaseModel.h"
+#import <Foundation/Foundation.h>
+@interface goodsModel : NSObject
+@property (nonatomic , retain) NSString * goodsId; //商品ID
+@property (nonatomic , retain) NSString * goodsName;  //商品名称
+@property (nonatomic, retain) NSString *vipPrice;
+@property (nonatomic , assign) float goodsPrice;  //商品价格
+@property (nonatomic , assign) NSInteger goodsNumber;  //商品数量
+@property (nonatomic , retain) NSString * goodsPic; // 商品图片
+@property (nonatomic,  strong) NSArray *groupDetail;
+
+/**商品详情中缩略图*/
+@property (nonatomic , strong) NSString * smallGoodsPic;
+/**商品详情是否热销*/
+@property (nonatomic , assign) NSInteger isHot;
+@end

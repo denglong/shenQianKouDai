@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="9060" systemVersion="15A284" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9051"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="82" id="KGk-i7-Jjw" customClass="HeaderCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="80"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="79"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Utb-mN-sV6">
+                        <rect key="frame" x="10" y="10" width="60" height="60"/>
+                        <animations/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="60" id="NYM-SE-fSU"/>
+                            <constraint firstAttribute="height" constant="60" id="cBH-JR-OnR"/>
+                        </constraints>
+                    </imageView>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="已完成32单" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="noU-il-oDy">
+                        <rect key="frame" x="78" y="48" width="73" height="17"/>
+                        <animations/>
+                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                        <color key="textColor" red="1" green="0.3529411764705882" blue="0.11764705882352941" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="approve_img.png" translatesAutoresizingMaskIntoConstraints="NO" id="xNX-1O-5V9">
+                        <rect key="frame" x="117" y="19" width="43" height="13"/>
+                        <animations/>
+                    </imageView>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="right_arrows.png" translatesAutoresizingMaskIntoConstraints="NO" id="lTu-ib-Xat">
+                        <rect key="frame" x="298" y="32" width="9" height="15"/>
+                        <animations/>
+                    </imageView>
+                    <button opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Juw-YE-rKh">
+                        <rect key="frame" x="77" y="11" width="30" height="29"/>
+                        <animations/>
+                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                        <state key="normal">
+                            <color key="titleColor" red="0.094117647060000004" green="0.094117647060000004" blue="0.094117647060000004" alpha="1" colorSpace="calibratedRGB"/>
+                        </state>
+                    </button>
+                </subviews>
+                <animations/>
+                <constraints>
+                    <constraint firstItem="Juw-YE-rKh" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="topMargin" constant="11" id="428-cs-yUZ"/>
+                    <constraint firstItem="Utb-mN-sV6" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leadingMargin" constant="10" id="8vD-SU-mmm"/>
+                    <constraint firstAttribute="bottomMargin" secondItem="noU-il-oDy" secondAttribute="bottom" constant="14" id="Hwp-3c-O28"/>
+                    <constraint firstItem="Utb-mN-sV6" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="JIl-Yc-fYX"/>
+                    <constraint firstAttribute="trailingMargin" secondItem="lTu-ib-Xat" secondAttribute="trailing" constant="13" id="OhS-KF-HPm"/>
+                    <constraint firstItem="xNX-1O-5V9" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="topMargin" constant="19" id="bOp-qK-TWN"/>
+                    <constraint firstItem="lTu-ib-Xat" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="bTV-mf-TDv"/>
+                    <constraint firstItem="xNX-1O-5V9" firstAttribute="leading" secondItem="Juw-YE-rKh" secondAttribute="trailing" constant="10" id="dnY-SK-Pde"/>
+                    <constraint firstItem="noU-il-oDy" firstAttribute="leading" secondItem="Utb-mN-sV6" secondAttribute="trailing" constant="8" id="n02-e8-IYT"/>
+                    <constraint firstItem="Juw-YE-rKh" firstAttribute="leading" secondItem="Utb-mN-sV6" secondAttribute="trailing" constant="7" id="q2T-EJ-U7S"/>
+                </constraints>
+                <edgeInsets key="layoutMargins" top="0.0" left="0.0" bottom="0.0" right="0.0"/>
+            </tableViewCellContentView>
+            <animations/>
+            <connections>
+                <outlet property="headerImage" destination="Utb-mN-sV6" id="VGf-bi-S8D"/>
+                <outlet property="shopName" destination="Juw-YE-rKh" id="eDN-mo-iPA"/>
+                <outlet property="totalNum" destination="noU-il-oDy" id="gOx-Ic-OgT"/>
+            </connections>
+            <point key="canvasLocation" x="466" y="293"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="approve_img.png" width="43" height="13"/>
+        <image name="right_arrows.png" width="9" height="15"/>
+    </resources>
+</document>

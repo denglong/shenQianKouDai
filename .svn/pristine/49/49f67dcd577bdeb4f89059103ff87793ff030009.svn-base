@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="11762" systemVersion="16A323" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" rowHeight="100" id="KGk-i7-Jjw" customClass="BusinessInfoCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="100"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="99"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="d9u-lt-Uv7">
+                        <rect key="frame" x="10" y="10" width="50" height="50"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="50" id="RAq-Ln-YOf"/>
+                            <constraint firstAttribute="width" constant="50" id="s1d-mP-XWg"/>
+                        </constraints>
+                    </imageView>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="匿名" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="acU-xf-SW6">
+                        <rect key="frame" x="70" y="10" width="24" height="15"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="一般，接货很慢，送货也很慢" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7Zq-DN-K7c">
+                        <rect key="frame" x="70" y="60" width="156" height="15"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="2015-12-30" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dW3-He-PpB">
+                        <rect key="frame" x="242" y="10" width="68" height="15"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                        <color key="textColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="综合评分" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="R9e-3G-ls9">
+                        <rect key="frame" x="70" y="35" width="48" height="15"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fPr-es-pZO">
+                        <rect key="frame" x="10" y="70" width="50" height="20"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <color key="backgroundColor" red="0.49560117721557617" green="0.73129379749298096" blue="0.09688018262386322" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                        <state key="normal" title="申诉">
+                            <color key="titleColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        </state>
+                        <state key="disabled" title="已申诉"/>
+                    </button>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="acU-xf-SW6" firstAttribute="leading" secondItem="d9u-lt-Uv7" secondAttribute="trailing" constant="10" id="0qJ-Ep-2xC"/>
+                    <constraint firstItem="R9e-3G-ls9" firstAttribute="top" secondItem="acU-xf-SW6" secondAttribute="bottom" constant="10" id="7Ph-BB-kyG"/>
+                    <constraint firstItem="7Zq-DN-K7c" firstAttribute="leading" secondItem="d9u-lt-Uv7" secondAttribute="trailing" constant="10" id="KWW-fp-eAC"/>
+                    <constraint firstItem="d9u-lt-Uv7" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="10" id="MC6-Es-6fP"/>
+                    <constraint firstItem="7Zq-DN-K7c" firstAttribute="top" secondItem="R9e-3G-ls9" secondAttribute="bottom" constant="10" id="ODq-gU-reU"/>
+                    <constraint firstAttribute="trailing" secondItem="dW3-He-PpB" secondAttribute="trailing" constant="10" id="OXw-9N-IRh"/>
+                    <constraint firstItem="acU-xf-SW6" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="10" id="a56-tN-5q3"/>
+                    <constraint firstItem="R9e-3G-ls9" firstAttribute="leading" secondItem="d9u-lt-Uv7" secondAttribute="trailing" constant="10" id="a8f-iG-4mZ"/>
+                    <constraint firstItem="d9u-lt-Uv7" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="10" id="av0-Tw-qzX"/>
+                    <constraint firstItem="dW3-He-PpB" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="10" id="hqC-kx-sht"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="complainBtn" destination="fPr-es-pZO" id="r0l-WJ-E4i"/>
+                <outlet property="contentLabel" destination="7Zq-DN-K7c" id="Sks-Jt-0Bb"/>
+                <outlet property="timeLabel" destination="dW3-He-PpB" id="cf6-tL-bZf"/>
+                <outlet property="userHeaderImageView" destination="d9u-lt-Uv7" id="omL-qj-Uhk"/>
+                <outlet property="userNameLabel" destination="acU-xf-SW6" id="t0K-nJ-ybd"/>
+            </connections>
+            <point key="canvasLocation" x="333" y="307"/>
+        </tableViewCell>
+    </objects>
+</document>

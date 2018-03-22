@@ -1,0 +1,33 @@
+//
+//  OrderDetailFootCell.h
+//  KingProFrame
+//
+//  Created by lihualin on 15/8/6.
+//  Copyright (c) 2015年 king. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+#import "OrderDetail.h"
+@interface OrderDetailFootCell : UITableViewCell
+@property (weak, nonatomic) IBOutlet UILabel *addressLabel;
+@property (weak, nonatomic) IBOutlet UILabel *nameLabel;
+@property (weak, nonatomic) IBOutlet UILabel *phonelabel;
+@property (weak, nonatomic) IBOutlet UILabel *kindLabel;//支付方式
+@property (weak, nonatomic) IBOutlet UILabel *timeOrderlabel;//下单时间
+@property (weak, nonatomic) IBOutlet UILabel *timeLabel; //收货时间
+/**支付方式*/
+@property (weak, nonatomic) IBOutlet UIView *payView;
+@property (weak, nonatomic) IBOutlet UIView *detailView;
+@property (weak, nonatomic) IBOutlet UILabel *remarkLabel;//备注
+@property (weak, nonatomic) IBOutlet UIView *remarkView;
+
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *timeConstraint;
+@property (weak, nonatomic) IBOutlet UILabel *peopleLabel;
+@property (weak, nonatomic) IBOutlet UILabel *peoplePhone;
+@property (weak, nonatomic) IBOutlet UILabel *peopleAddress;
+@property (weak, nonatomic) IBOutlet UILabel *createTime;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *kindConstraints;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *orderNoConstraints;
+
+@property(nonatomic ,retain) OrderDetail * orderDetail;
+@end

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="11762" systemVersion="16A323" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="CYActivityView">
+            <rect key="frame" x="0.0" y="0.0" width="411" height="607"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <imageView contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="AD" translatesAutoresizingMaskIntoConstraints="NO" id="B5P-KU-FhC">
+                    <rect key="frame" x="20" y="77" width="371" height="453"/>
+                    <constraints>
+                        <constraint firstAttribute="width" secondItem="B5P-KU-FhC" secondAttribute="height" multiplier="27:33" id="91w-8b-UcE"/>
+                    </constraints>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                            <integer key="value" value="10"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                </imageView>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="JPy-P2-CAV">
+                    <rect key="frame" x="373" y="60" width="35" height="35"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="35" id="0ia-NP-hir"/>
+                        <constraint firstAttribute="height" constant="35" id="GcZ-WY-LfG"/>
+                    </constraints>
+                    <state key="normal" image="ADClose">
+                        <color key="titleShadowColor" red="0.5" green="0.5" blue="0.5" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    </state>
+                    <connections>
+                        <action selector="closeButtonClicked" destination="iN0-l3-epB" eventType="touchUpInside" id="4Cf-Xz-aGl"/>
+                    </connections>
+                </button>
+            </subviews>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="B5P-KU-FhC" secondAttribute="trailing" constant="20" id="Ee4-Z6-wtN"/>
+                <constraint firstItem="JPy-P2-CAV" firstAttribute="leading" secondItem="B5P-KU-FhC" secondAttribute="trailing" constant="-18" id="InB-QC-06w"/>
+                <constraint firstItem="B5P-KU-FhC" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="Ozi-dJ-7UJ"/>
+                <constraint firstItem="B5P-KU-FhC" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="Sbr-xd-IkL"/>
+                <constraint firstItem="B5P-KU-FhC" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="20" id="dW1-mX-MNU"/>
+                <constraint firstItem="B5P-KU-FhC" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="20" id="fMY-Bd-3RP"/>
+                <constraint firstAttribute="bottom" secondItem="B5P-KU-FhC" secondAttribute="bottom" constant="20" id="pkD-s1-cQk"/>
+                <constraint firstItem="B5P-KU-FhC" firstAttribute="top" secondItem="JPy-P2-CAV" secondAttribute="bottom" constant="-18" id="yFE-ce-LJV"/>
+            </constraints>
+            <nil key="simulatedStatusBarMetrics"/>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <variation key="default">
+                <mask key="constraints">
+                    <exclude reference="fMY-Bd-3RP"/>
+                    <exclude reference="pkD-s1-cQk"/>
+                </mask>
+            </variation>
+            <connections>
+                <outlet property="ADImageView" destination="B5P-KU-FhC" id="7VX-PL-Iud"/>
+            </connections>
+            <point key="canvasLocation" x="380.5" y="124.5"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="AD" width="320" height="568"/>
+        <image name="ADClose" width="30" height="30"/>
+    </resources>
+</document>

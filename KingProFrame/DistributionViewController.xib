@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="11542" systemVersion="15G31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11524"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="DistributionViewController">
+            <connections>
+                <outlet property="myTableView" destination="F09-Dx-bqW" id="ZJg-qh-Raa"/>
+                <outlet property="nullImage" destination="7g4-4H-jNH" id="INx-HG-ZcF"/>
+                <outlet property="nullLab" destination="sbu-5d-MGw" id="f6a-Uc-yIn"/>
+                <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="F09-Dx-bqW">
+                    <rect key="frame" x="10" y="10" width="355" height="657"/>
+                    <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+                    <inset key="separatorInset" minX="15" minY="0.0" maxX="15" maxY="0.0"/>
+                    <connections>
+                        <outlet property="dataSource" destination="-1" id="eQy-Uc-UhL"/>
+                        <outlet property="delegate" destination="-1" id="RuK-8t-Ux6"/>
+                    </connections>
+                </tableView>
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="icon_null.png" translatesAutoresizingMaskIntoConstraints="NO" id="7g4-4H-jNH">
+                    <rect key="frame" x="160.5" y="307" width="54" height="53"/>
+                </imageView>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="sbu-5d-MGw">
+                    <rect key="frame" x="0.0" y="370" width="375" height="0.0"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                    <color key="textColor" red="0.66666666666666663" green="0.66666666666666663" blue="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <nil key="highlightedColor"/>
+                </label>
+            </subviews>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <gestureRecognizers/>
+            <constraints>
+                <constraint firstItem="F09-Dx-bqW" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="10" id="6xj-tS-y0L"/>
+                <constraint firstItem="sbu-5d-MGw" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="7R3-6C-Ikq"/>
+                <constraint firstAttribute="bottom" secondItem="F09-Dx-bqW" secondAttribute="bottom" id="Lkz-QT-e8E"/>
+                <constraint firstAttribute="centerX" secondItem="7g4-4H-jNH" secondAttribute="centerX" id="NwN-z7-wpK"/>
+                <constraint firstItem="sbu-5d-MGw" firstAttribute="top" secondItem="7g4-4H-jNH" secondAttribute="bottom" constant="10" id="bmA-Gx-DHv"/>
+                <constraint firstAttribute="trailing" secondItem="sbu-5d-MGw" secondAttribute="trailing" id="j4S-zn-VlV"/>
+                <constraint firstAttribute="trailing" secondItem="F09-Dx-bqW" secondAttribute="trailing" constant="10" id="jyt-uz-ePs"/>
+                <constraint firstAttribute="centerY" secondItem="7g4-4H-jNH" secondAttribute="centerY" id="lww-MP-Gxd"/>
+                <constraint firstItem="F09-Dx-bqW" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="10" id="wGk-cM-I7L"/>
+            </constraints>
+            <connections>
+                <outletCollection property="gestureRecognizers" destination="mV9-xJ-RAf" appends="YES" id="yTV-gh-aLf"/>
+            </connections>
+        </view>
+        <tapGestureRecognizer id="mV9-xJ-RAf">
+            <connections>
+                <action selector="hiddenKeyboardAction:" destination="-1" id="bqd-kM-oUz"/>
+            </connections>
+        </tapGestureRecognizer>
+    </objects>
+    <resources>
+        <image name="icon_null.png" width="54" height="53"/>
+    </resources>
+</document>

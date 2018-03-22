@@ -1,0 +1,123 @@
+//
+//  OrderDetail.h
+//  KingProFrame
+//
+//  Created by lihualin on 15/8/10.
+//  Copyright (c) 2015年 king. All rights reserved.
+//
+
+//#import "ResponseModel.h"
+#import <Foundation/Foundation.h>
+@interface OrderDetail : NSObject
+/**订单号*/
+@property (nonatomic , retain) NSString * orderNo;
+/**订单状态*/
+@property (nonatomic , assign) NSInteger  orderStatus;
+/**用户选择的送达时间*/
+@property (nonatomic , retain) NSString * userDeliveryTime;
+/**下单时间*/
+@property (nonatomic , retain) NSString * createTime;
+/**收获码*/
+@property (nonatomic , retain) NSString * receiveCode;
+@property (nonatomic, retain) NSString *shippingType;
+
+/**是否可取消*/
+@property (nonatomic , assign) NSInteger  isCancel;
+/**使用优惠券金额*/
+@property (nonatomic , assign) float      couponPrice;
+/**优惠券名称*/
+@property (nonatomic , retain) NSString * couponName;
+/**配送费文案*/
+@property (nonatomic , retain) NSString * expressText;
+/**配送费*/
+@property (nonatomic , assign) float      expressPrice;
+
+/**小费金额*/
+@property (nonatomic , assign) float      tipPrice;
+/**平台奖励金额*/
+@property (nonatomic , assign) float      platExprPrice;
+/**实付款（应付款）*/
+@property (nonatomic , assign) float      payPrice;
+/**支付方式*/
+@property (nonatomic , assign) NSInteger  payType;
+/**订单备注*/
+@property (nonatomic , retain) NSString * orderRemark;
+
+/**商家id*/
+@property (nonatomic , retain) NSString * shopId;
+/**商家名称*/
+@property (nonatomic , retain) NSString * name;
+/**商家图片地址*/
+@property (nonatomic , retain) NSString * imgUrl;
+/**是否已认证*/
+@property (nonatomic , retain) NSString * ifCheck;
+/**已完成订单数量*/
+@property (nonatomic , retain) NSString * finishOrder;
+
+/**联系人电话*/
+@property (nonatomic , retain) NSString * mobile;
+/**收货地址id*/
+@property (nonatomic , retain) NSString * addressId;
+/**收货地址名称*/
+@property (nonatomic , retain) NSString * address;
+/**收货具体地址*/
+@property (nonatomic , retain) NSString * addressDetail;
+/**收货人名称*/
+@property (nonatomic , retain) NSString * addressUser;
+
+/**收货人电话*/
+@property (nonatomic , retain) NSString * addressTel;
+/**可发红包数量*/
+@property (nonatomic , assign) NSInteger packets;
+/**发红包链接*/
+@property (nonatomic , retain) NSString * packetUrl;
+/**服务器当前时间*/
+@property (nonatomic , retain) NSString * serverTime;
+/**商品列表*/
+@property (nonatomic , retain) NSArray * goodsList;
+
+/**是否可抢单*/
+@property (nonatomic , retain) NSString * isAccept;
+/**距约定时间*/
+@property (nonatomic , assign) NSInteger  countDown;
+/**收货人地址经度*/
+@property (nonatomic , retain) NSString * lng;
+/**收货人地址纬度*/
+@property (nonatomic , retain) NSString * lat;
+/**状态文案A*/
+@property (nonatomic , retain) NSString * orderTextA;
+
+/**状态文案B*/
+@property (nonatomic , retain) NSString * orderTextB;
+/**红包标题*/
+@property (nonatomic , retain) NSString * packTitle;
+/**红包文案*/
+@property (nonatomic , retain) NSString * packText;
+/**红包分享图片*/
+@property (nonatomic , retain) NSString * packImg;
+/**地址区域*/
+@property (nonatomic , retain) NSString * street;
+
+/**类型 1= 秒杀商品订单  0 = 普通*/
+@property (nonatomic , assign) NSInteger  seckill;
+/**类型 1= 无现货（预售）商品订单  0 = 普通*/
+@property (nonatomic , assign) NSInteger  yushou;
+/**预售商品订单（店主端）佣金*/
+@property (nonatomic , assign) float      commission;
+/**判断是否显示再来一单 1= 是，0=不是*/
+@property (nonatomic , assign) NSInteger  again;
+
+//3.2.8
+/**订单取消时间*/
+@property (nonatomic , retain) NSString * cancelTime;
+/**状态文案A*/
+@property (nonatomic , retain) NSString * orderTextC;
+/**商品总价*/
+@property (nonatomic , assign) float      totalPrice;
+/**取消状态 1 超时未支付取消 2 商家取消 3 未支付客户取消 4 无人接单取消 5 支付后客户取消*/
+@property (nonatomic , assign) NSInteger  cancelStatus;
+/**订单取消原因*/
+@property (nonatomic , retain) NSString * cancelRemark;
+/**退款状态*/
+@property (nonatomic , assign) NSInteger  refundStatus;
+@end

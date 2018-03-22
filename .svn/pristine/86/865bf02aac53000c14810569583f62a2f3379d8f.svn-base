@@ -1,0 +1,139 @@
+//
+//  CommodityDetailHeaderCell.m
+//  KingProFrame
+//
+//  Created by lihualin on 15/12/3.
+//  Copyright © 2015年 king. All rights reserved.
+//
+
+#import "CommodityDetailHeaderCell.h"
+#import "Headers.h"
+#import "CYGoodsTagModel.h"
+@implementation CommodityDetailHeaderCell
+
+- (void)awakeFromNib {
+    [super awakeFromNib];
+   
+    self.signLabel1.layer.borderWidth = 0.5;
+    self.signLabel2.layer.borderWidth = 0.5;
+    self.signLabel3.layer.borderWidth = 0.5;
+    self.backgroundColor = [UIColor whiteColor];
+    
+    self.bgView = [[UIView alloc] init];
+    self.bgView.backgroundColor = [UIColor blackColor];
+    self.bgView.hidden = YES;
+    UIWindow *window = [UIApplication sharedApplication].keyWindow;
+    [window addSubview:self.bgView];
+    
+    self.goodImage = [[UIImageView alloc] init];
+    [self.bgView addSubview:self.goodImage];
+    
+    UITapGestureRecognizer* singleRecognizer;
+    singleRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hidenBtn:)];
+    //点击的次数
+    singleRecognizer.numberOfTapsRequired = 1; // 单击
+
+    [self.bgView addGestureRecognizer:singleRecognizer];
+    
+    [self.bgView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.top.equalTo(window).offset(0);
+        make.left.equalTo(window).offset(0);
+        make.bottom.equalTo(window).offset(0);
+        make.right.equalTo(window).offset(0);
+    }];
+    
+    [self.goodImage mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.equalTo(window).offset(0);
+        make.right.equalTo(window).offset(0);
+        make.height.equalTo(@(viewWidth*0.75));
+        make.centerY.equalTo(window);
+    }];
+    
+    
+}
+
+-(void)setCommodity:(Commodity *)commodity
+{
+    self.signLabel1.hidden = YES;
+    self.signLabel2.hidden = YES;
+    self.signLabel3.hidden = YES;
+    NSString *urlStr = [NSString stringWithFormat:@"%@?x-oss-process=image/resize,m_lfit,h_500,w_500", commodity.goodsPic];
+    NSURL * url = [NSURL URLWithString:urlStr];
+    self.commodityImageView.contentMode = UIViewContentModeScaleAspectFit;
+    [self.commodityImageView setImageWithURL:url placeholderImage:[UIImage imageNamed:@"orderShopHeader"]];
+    [self.goodImage setImageWithURL:url placeholderImage:[UIImage imageNamed:@"orderShopHeader"]];
+    self.commodityNameLabel.text = commodity.goodsName;
+    
+    MyInfoModel *myInfo = [MyInfoModel sharedInstance];
+    if ([myInfo.userType integerValue] == 1) {
+        self.commodityPricelabel.text = [NSString stringWithFormat:@"￥%@",commodity.vipPrice?commodity.vipPrice:@"0.00"];
+        
+        NSDictionary *attribtDic = @{NSStrikethroughStyleAttributeName: [NSNumber numberWithInteger:NSUnderlineStyleSingle]};
+        NSMutableAttributedString *attribtStr = [[NSMutableAttributedString alloc]initWithString:[NSString stringWithFormat:@"￥%.2f", commodity.goodsPrice] attributes:attribtDic];
+        self.vipPrice.attributedText = attribtStr;
+    }
+    else
+    {
+    self.commodityPricelabel.text = [NSString stringWithFormat:@"￥%.2f",commodity.goodsPrice];
+        NSDictionary *attribtDic = @{NSStrikethroughStyleAttributeName: [NSNumber numberWithInteger:NSUnderlineStyleSingle]};
+        NSMutableAttributedString *attribtStr = [[NSMutableAttributedString alloc]initWithString:[NSString stringWithFormat:@"VIP ￥%@", commodity.vipPrice?commodity.vipPrice:@"0.00"] attributes:attribtDic];
+        self.vipPrice.attributedText = attribtStr;
+    }
+//    self.addCommodityBtn.tag = -1;
+    //赠品信息
+    self.giftInfoLabel.text = commodity.giftInfo;
+    if ([DataCheck isValidString:commodity.giftInfo]) {
+        self.giftInfoLabel.hidden = NO;
+    }else{
+        self.giftInfoLabel.hidden = YES;
+    }
+    //标签
+    if (commodity.goodsTags.count == 1) {
+        self.signLabel2.hidden = NO;
+        [self setSignLabel:self.signLabel2 signModel:[commodity.goodsTags firstObject]];
+        return;
+    }
+    if (commodity.goodsTags.count == 2) {
+        self.signLabel1.hidden = NO;
+        [self setSignLabel:self.signLabel1 signModel:[commodity.goodsTags firstObject]];
+        self.signLabel2.hidden = NO;
+        [self setSignLabel:self.signLabel2 signModel:[commodity.goodsTags lastObject]];
+        self.signLabel2CenterConstraint.constant = (self.signLabel1.frame.size.width+5)/2;
+        return;
+    }
+    
+    if (commodity.goodsTags.count == 3) {
+        self.signLabel2.hidden = NO;
+        self.signLabel3.hidden = NO;
+        self.signLabel1.hidden = NO;
+        [self setSignLabel:self.signLabel1 signModel:[commodity.goodsTags firstObject]];
+        [self setSignLabel:self.signLabel2 signModel:[commodity.goodsTags objectAtIndex:1]];
+        [self setSignLabel:self.signLabel3 signModel:[commodity.goodsTags lastObject]];
+        return;
+    }
+}
+
+-(void)setSignLabel:(UIButton *)signLabel signModel:(CYGoodsTagModel *)signDic
+{
+    signLabel.layer.borderColor = [UIColor_HEX colorWithHexString:signDic.borderColor].CGColor;
+    [signLabel setTitle:signDic.text forState:UIControlStateDisabled];
+    [signLabel setTitleColor:[UIColor_HEX colorWithHexString:signDic.textColor] forState:UIControlStateDisabled];
+    signLabel.backgroundColor = [UIColor_HEX colorWithHexString:signDic.bgColor];
+    if (signDic.borderStyle == 3) {
+        signLabel.layer.cornerRadius = signLabel.frame.size.height/2;
+    }else if (signDic.borderStyle == 2){
+        signLabel.layer.cornerRadius = signLabel.frame.size.height/4;
+    }
+
+   
+}
+
+- (IBAction)imgButtonAction:(id)sender {
+    
+    self.bgView.hidden = NO;
+}
+
+- (void)hidenBtn:(UITapGestureRecognizer *)sender {
+    self.bgView.hidden = YES;
+}
+@end

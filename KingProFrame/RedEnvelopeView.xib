@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="9531" systemVersion="15C50" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9529"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="RedEnvelopeView">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view alpha="0.5" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="BlH-ZE-GJE">
+                    <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                    <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                </view>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Mw4-ex-nPA">
+                    <rect key="frame" x="30" y="126" width="275" height="315"/>
+                    <subviews>
+                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="redbaoBg.png" translatesAutoresizingMaskIntoConstraints="NO" id="QCc-13-l1g">
+                            <rect key="frame" x="0.0" y="15" width="260" height="300"/>
+                        </imageView>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="恭喜获得26个红包可以分享" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="spI-im-Pin">
+                            <rect key="frame" x="0.0" y="129" width="260" height="21"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                            <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="分享红包给好友\n红包可用于抵扣在线支付金额" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Tvp-Zt-jmr">
+                            <rect key="frame" x="0.0" y="146" width="260" height="50"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                            <color key="textColor" red="0.95294117649999999" green="0.7843137255" blue="0.28627450980000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Fn1-FV-2LX">
+                            <rect key="frame" x="245" y="0.0" width="30" height="30"/>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="19"/>
+                            <state key="normal" title="x" image="redBaoCancelBtn.png">
+                                <color key="titleColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
+                            <connections>
+                                <action selector="cancelOrOkBtnClick:" destination="iN0-l3-epB" eventType="touchUpInside" id="qX0-JE-pdg"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" tag="1" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="fill" contentVerticalAlignment="fill" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4nb-ZP-EOf">
+                            <rect key="frame" x="35" y="232" width="190" height="39"/>
+                            <color key="backgroundColor" red="0.5" green="0.75076252720000003" blue="0.42341877719999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <state key="normal" image="redBaoBTn.png">
+                                <color key="titleColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
+                            <connections>
+                                <action selector="cancelOrOkBtnClick:" destination="iN0-l3-epB" eventType="touchUpInside" id="hEL-Tg-l8Y"/>
+                            </connections>
+                        </button>
+                    </subviews>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="315" id="1wY-mJ-cZS"/>
+                        <constraint firstAttribute="width" constant="275" id="Bir-XI-G7E"/>
+                    </constraints>
+                </view>
+            </subviews>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstItem="BlH-ZE-GJE" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="3hW-HM-CRy"/>
+                <constraint firstAttribute="centerY" secondItem="Mw4-ex-nPA" secondAttribute="centerY" id="5Ik-LO-5Yf"/>
+                <constraint firstAttribute="centerX" secondItem="Mw4-ex-nPA" secondAttribute="centerX" constant="-8" id="7O4-Gt-VxE"/>
+                <constraint firstAttribute="bottom" secondItem="BlH-ZE-GJE" secondAttribute="bottom" id="L2L-Yh-FbG"/>
+                <constraint firstItem="BlH-ZE-GJE" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="YgB-Tr-DgQ"/>
+                <constraint firstAttribute="trailing" secondItem="BlH-ZE-GJE" secondAttribute="trailing" id="zZh-Ni-XFy"/>
+            </constraints>
+            <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
+            <connections>
+                <outlet property="cancelBtn" destination="Fn1-FV-2LX" id="x9V-E3-lUj"/>
+                <outlet property="reEnvelopeCountLabel" destination="spI-im-Pin" id="CMa-gp-a7B"/>
+                <outlet property="sendRedBtn" destination="4nb-ZP-EOf" id="x1f-am-tYo"/>
+                <outlet property="textALabel" destination="Tvp-Zt-jmr" id="d91-3M-vZb"/>
+            </connections>
+            <point key="canvasLocation" x="-15" y="20"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="redBaoBTn.png" width="190" height="39"/>
+        <image name="redBaoCancelBtn.png" width="35" height="35"/>
+        <image name="redbaoBg.png" width="232" height="269"/>
+    </resources>
+</document>
